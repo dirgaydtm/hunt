@@ -3,7 +3,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/date_time_extension.dart';
 import '../../../../shared/widgets/hunt_calendar.dart';
-import '../constants/home_constants.dart';
+import '../../../features/home/presentation/constants/home_constants.dart';
 import 'location_sheet.dart';
 import '../../../../shared/widgets/hunt_button.dart';
 

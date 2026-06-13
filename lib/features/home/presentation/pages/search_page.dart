@@ -6,7 +6,7 @@ import '../../../../shared/widgets/hunt_text_field.dart';
 import '../../../../shared/widgets/opportunity_card.dart';
 import '../../data/models/opportunity_model.dart';
 import '../providers/home_provider.dart';
-import '../widgets/filter_sheet.dart';
+import '../../../../shared/widgets/filter_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
