@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/hunt_text_field.dart';
+import '../../../../shared/widgets/filter_sheet.dart';
 import '../providers/bookmark_provider.dart';
 
 class BookmarkHeader extends ConsumerStatefulWidget {
@@ -25,6 +26,16 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _showFilter(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const FilterSheet(),
+    );
   }
 
   @override
@@ -64,7 +75,7 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
                       hintText: 'Cari bookmark ...',
                       prefixIcon: Icons.search,
                       suffixIcon: GestureDetector(
-                        onTap: () {},
+                        onTap: () => _showFilter(context),
                         child: const Icon(
                           Icons.tune_rounded,
                           color: AppColors.greyLightDark,
