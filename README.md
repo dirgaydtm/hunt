@@ -1,17 +1,45 @@
-# hunt
+lib/
+├── main.dart                          # cuma runApp(), tipis
+│
+├── app/
+│   ├── app.dart                       # root widget: MaterialApp.router()
+│   └── config/
+│       └── router.dart
+│
+├── core/
+│   ├── theme/
+│   │   ├── app_colors.dart
+│   │   ├── app_text_styles.dart
+│   │   └── app_theme.dart
+│   ├── network/
+│   │   └── dio_client.dart            # instance Dio + interceptor, generic
+│   ├── errors/
+│   │   └── failures.dart
+│   └── utils/
+│       └── extensions.dart
+│
+├── features/
+│   ├── onboarding/
+│   ├── home/
+│   └── feature-x/
+│       ├── data/
+│       │   ├── models/
+│       │   │   └── feature_x_model.dart
+│       │   ├── services/
+│       │   │   └── feature_x_remote_datasource.dart   # panggil dio_client + endpoint
+│       │   └── repositories/
+│       │       └── feature_x_repository.dart          # konkret, langsung dipanggil provider
+│       └── presentation/
+│           ├── providers/
+│           │   └── feature_x_provider.dart
+│           ├── pages/
+│           │   └── feature_x_page.dart
+│           └── widgets/
+│
+└── shared/
+    ├── models/
+    └── widgets/
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+assets/
+├── images/
+└── icons/
