@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
-import '../features/home/presentation/pages/home_page.dart';
+import 'config/app_router.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Hunt App',
       theme: AppTheme.theme,
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Hunt Home Page'),
+      routerConfig: AppRouter.router,
     );
   }
 }
