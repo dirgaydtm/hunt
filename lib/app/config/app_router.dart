@@ -11,6 +11,11 @@ abstract final class AppRouter {
         path: '/home',
         builder: (context, state) => const MyHomePage(title: 'Hunt Home Page'),
       ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterPage(),
+      ),
     ],
   );
 }
