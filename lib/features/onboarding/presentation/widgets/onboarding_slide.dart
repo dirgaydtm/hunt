@@ -9,7 +9,7 @@ class OnboardingSlide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
+      padding: EdgeInsets.symmetric(horizontal: 40),
       child: Column(
         children: [
           const Spacer(flex: 1),
@@ -17,11 +17,11 @@ class OnboardingSlide extends StatelessWidget {
             height: MediaQuery.of(context).size.height * 0.4,
             child: Image.asset(slide.image, fit: BoxFit.contain),
           ),
-          const SizedBox(height: 56),
+          SizedBox(height: 56),
           Text(
             slide.title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: AppTextStyles.fontFamily,
               fontSize: 29,
               fontWeight: AppFontWeight.extraBold,
@@ -29,11 +29,11 @@ class OnboardingSlide extends StatelessWidget {
               height: 1.2,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             slide.subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: AppTextStyles.fontFamily,
               fontSize: 14,
               fontWeight: AppFontWeight.regular,

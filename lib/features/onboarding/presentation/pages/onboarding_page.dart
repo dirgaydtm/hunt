@@ -129,7 +129,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         final isActive = index == _currentPageIndex;
                         return AnimatedContainer(
                           duration: const Duration(milliseconds: 250),
-                          margin: const EdgeInsets.only(right: 6),
+                          margin: EdgeInsets.only(right: 6),
                           height: 8,
                           width: isActive ? 24 : 8,
                           decoration: BoxDecoration(
@@ -141,10 +141,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         );
                       }),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     GestureDetector(
                       onTap: () => context.go('/login'),
-                      child: const Text(
+                      child: Text(
                         'Skip',
                         style: TextStyle(
                           fontFamily: AppTextStyles.fontFamily,

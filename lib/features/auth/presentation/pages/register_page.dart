@@ -23,7 +23,7 @@ class RegisterPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLoading = ref.watch(authProvider);
+    final isLoading = ref.watch(authProvider).isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.greyLightLightActive,
@@ -52,7 +52,7 @@ class RegisterPage extends ConsumerWidget {
                     const RegisterForm(),
                     SizedBox(height: MediaQuery.of(context).size.height * 0.04),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 100),
+                      padding: EdgeInsets.symmetric(horizontal: 100),
                       child: Column(
                         crossAxisAlignment: .stretch,
                         children: [
@@ -78,7 +78,7 @@ class RegisterPage extends ConsumerWidget {
                           Center(
                             child: RichText(
                               text: TextSpan(
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: AppTextStyles.fontFamily,
                                   fontSize: 14,
                                   color: AppColors.greyLightDarker,
@@ -87,7 +87,7 @@ class RegisterPage extends ConsumerWidget {
                                   const TextSpan(text: 'Sudah memiliki akun? '),
                                   TextSpan(
                                     text: 'Masuk',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: AppFontWeight.bold,
                                       color: AppColors.blueNormalActive,
                                     ),

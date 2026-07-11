@@ -6,23 +6,25 @@ import '../../core/theme/app_text_styles.dart';
 class HuntTextField extends StatefulWidget {
   final String? label;
   final String hintText;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
   final Widget? suffixIcon;
   final bool obscureText;
   final TextInputType keyboardType;
   final TextEditingController controller;
   final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
 
   const HuntTextField({
     super.key,
     this.label,
     required this.hintText,
-    required this.prefixIcon,
+    this.prefixIcon,
     required this.controller,
     this.suffixIcon,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.onChanged,
   });
 
   @override
@@ -40,14 +42,14 @@ class _HuntTextFieldState extends State<HuntTextField> {
         if (widget.label != null) ...[
           Text(
             widget.label!,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: AppTextStyles.fontFamily,
               fontSize: 14,
               fontWeight: AppFontWeight.bold,
               color: AppColors.greyDarkDark,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
         ],
         Container(
           decoration: BoxDecoration(
@@ -67,6 +69,7 @@ class _HuntTextFieldState extends State<HuntTextField> {
             controller: widget.controller,
             obscureText: widget.obscureText,
             keyboardType: widget.keyboardType,
+            onChanged: widget.onChanged,
             validator: (value) {
               final error = widget.validator?.call(value);
 
@@ -85,29 +88,31 @@ class _HuntTextFieldState extends State<HuntTextField> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
+              contentPadding: EdgeInsets.symmetric(
                 horizontal: 20,
                 vertical: 14,
               ),
               hintText: widget.hintText,
-              hintStyle: const TextStyle(
+              hintStyle: TextStyle(
                 fontFamily: AppTextStyles.fontFamily,
                 fontSize: 14,
                 fontWeight: AppFontWeight.regular,
                 color: AppColors.greyLightDark,
               ),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(left: 24, right: 12),
-                child: Icon(
-                  widget.prefixIcon,
-                  size: 16,
-                  color: AppColors.greyLightDark,
-                ),
-              ),
+              prefixIcon: widget.prefixIcon == null
+                  ? null
+                  : Padding(
+                      padding: EdgeInsets.only(left: 24, right: 12),
+                      child: Icon(
+                        widget.prefixIcon,
+                        size: 16,
+                        color: AppColors.greyLightDark,
+                      ),
+                    ),
               suffixIcon: widget.suffixIcon == null
                   ? null
                   : Padding(
-                      padding: const EdgeInsets.only(left: 12, right: 24),
+                      padding: EdgeInsets.only(left: 12, right: 24),
                       child: widget.suffixIcon,
                     ),
               enabledBorder: OutlineInputBorder(
@@ -135,7 +140,7 @@ class _HuntTextFieldState extends State<HuntTextField> {
                   width: 2,
                 ),
               ),
-              errorStyle: const TextStyle(
+              errorStyle: TextStyle(
                 fontFamily: AppTextStyles.fontFamily,
                 color: AppColors.redNormal,
               ),

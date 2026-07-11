@@ -16,10 +16,10 @@ class HuntDivider extends StatelessWidget {
           child: Divider(color: AppColors.greyLightNormalActive, thickness: 1),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: AppTextStyles.fontFamily,
               fontSize: 14,
               color: AppColors.blueNormal,

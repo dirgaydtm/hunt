@@ -18,7 +18,7 @@ class OnboardingButton extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isLastPage) {
       return Container(
-        padding: const EdgeInsets.all(4),
+        padding: EdgeInsets.all(4),
         decoration: BoxDecoration(
           borderRadius: .circular(30),
           border: Border.all(color: AppColors.blueLightActive, width: 3),
@@ -29,12 +29,12 @@ class OnboardingButton extends StatelessWidget {
             onTap: onTap,
             borderRadius: .circular(26),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
                 color: AppColors.blueNormal,
                 borderRadius: .circular(26),
               ),
-              child: const Text(
+              child: Text(
                 'Get Started',
                 style: TextStyle(
                   fontFamily: AppTextStyles.fontFamily,
@@ -74,7 +74,7 @@ class OnboardingButton extends StatelessWidget {
                 foregroundColor: Colors.white,
                 elevation: 0,
               ),
-              child: const Icon(Icons.chevron_right, size: 28),
+              child: Icon(Icons.chevron_right, size: 28),
             ),
           ),
         ],

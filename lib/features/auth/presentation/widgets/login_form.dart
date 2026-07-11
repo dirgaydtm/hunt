@@ -48,7 +48,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(authProvider);
+    final isLoading = ref.watch(authProvider).isLoading;
 
     return Container(
       padding: const .all(24.0),
@@ -69,7 +69,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         child: Column(
           crossAxisAlignment: .start,
           children: [
-            const SizedBox(height: 18),
+            SizedBox(height: 18),
             HuntTextField(
               label: 'Email',
               hintText: 'Masukkan email ...',
@@ -79,7 +79,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               validator: (v) =>
                   v == null || !v.contains('@') ? 'Email tidak valid' : null,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             HuntTextField(
               label: 'Kata Sandi',
               hintText: 'Masukkan kata sandi ...',
@@ -99,7 +99,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               validator: (v) =>
                   v == null || v.length < 6 ? 'Minimal 6 karakter' : null,
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
             Padding(
               padding: .symmetric(horizontal: 21),
               child: HuntButton(

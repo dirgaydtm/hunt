@@ -57,7 +57,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(authProvider);
+    final isLoading = ref.watch(authProvider).isLoading;
 
     return Container(
       padding: const .symmetric(horizontal: 30, vertical: 20),
@@ -78,7 +78,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
         child: Column(
           crossAxisAlignment: .start,
           children: [
-            const SizedBox(height: 18),
+            SizedBox(height: 18),
             HuntTextField(
               label: 'Nama Lengkap',
               hintText: 'Masukkan nama lengkap ...',
@@ -88,7 +88,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                   ? 'Nama tidak boleh kosong'
                   : null,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             HuntTextField(
               label: 'Email',
               hintText: 'Masukkan email ...',
@@ -98,7 +98,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
               validator: (v) =>
                   v == null || !v.contains('@') ? 'Email tidak valid' : null,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             HuntTextField(
               label: 'Kata Sandi',
               hintText: 'Masukkan kata sandi ...',
@@ -118,7 +118,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
               validator: (v) =>
                   v == null || v.length < 6 ? 'Minimal 6 karakter' : null,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             HuntTextField(
               label: 'Konfirmasi Kata Sandi',
               hintText: 'Konfirmasi kata sandi ...',
@@ -140,7 +140,7 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
                   ? 'Kata sandi tidak cocok'
                   : null,
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
             Padding(
               padding: .symmetric(horizontal: 21),
               child: HuntButton(

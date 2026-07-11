@@ -23,7 +23,7 @@ class LoginPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLoading = ref.watch(authProvider);
+    final isLoading = ref.watch(authProvider).isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.greyLightLightActive,
@@ -61,7 +61,7 @@ class LoginPage extends ConsumerWidget {
                       child: Column(
                         children: [
                           HuntDivider(text: 'atau'),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
                           HuntButton(
                             text: 'Masuk dengan Google',
                             isOutlined: true,
@@ -73,11 +73,11 @@ class LoginPage extends ConsumerWidget {
                             ),
                             onPressed: () => _handleGoogleLogin(ref, context),
                           ),
-                          const SizedBox(height: 32),
+                          SizedBox(height: 32),
                           Center(
                             child: RichText(
                               text: TextSpan(
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: AppTextStyles.fontFamily,
                                   fontSize: 14,
                                   color: AppColors.greyLightDarker,
@@ -86,7 +86,7 @@ class LoginPage extends ConsumerWidget {
                                   const TextSpan(text: 'Belum memiliki akun? '),
                                   TextSpan(
                                     text: 'Daftar',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: AppFontWeight.bold,
                                       color: AppColors.blueNormalActive,
                                     ),
