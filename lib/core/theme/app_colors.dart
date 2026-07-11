@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 abstract final class AppColors {
-
   // --- Green ---
   static const Color greenLight = Color(0xFFE8F7ED);
   static const Color greenLightHover = Color(0xFFD9F4E5);
@@ -85,4 +84,23 @@ abstract final class AppColors {
   static const Color greyLightDarkHover = Color(0xFF9E9E9E);
   static const Color greyLightDarkActive = Color(0xFF707070);
   static const Color greyLightDarker = Color(0xFF595756);
+
+  // --- Gradients ---
+  static const LinearGradient blueGradient = LinearGradient(
+    begin: Alignment(1.00, 1.00),
+    end: Alignment(1.00, 0.00),
+    colors: [Color(0xFF00A9B8), Color(0xFFB0E4E9)],
+  );
+
+  static const LinearGradient greenGradient = LinearGradient(
+    begin: Alignment(1.00, 1.00),
+    end: Alignment(1.00, 0.00),
+    colors: [Color(0xFF04B34F), Color(0xFFB1E7C8)],
+  );
+
+  static const LinearGradient yellowGradient = LinearGradient(
+    begin: Alignment(0.93, 0.34),
+    end: Alignment(0.94, -0.07),
+    colors: [Color(0xFFFFCD5E), Color(0xFFFFF0CD)],
+  );
 }
