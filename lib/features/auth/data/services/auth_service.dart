@@ -6,7 +6,7 @@ class AuthService {
     if (email == 'mahasiswa@hunt.com' && password == 'password123') {
       return UserModel(
         email: email,
-        name: 'Mahasiswa Hunt',
+        name: 'Mamang',
         token: 'mock_jwt_token_12345',
       );
     }
@@ -17,7 +17,7 @@ class AuthService {
     await Future.delayed(const Duration(milliseconds: 1500));
     return const UserModel(
       email: 'mahasiswa.google@hunt.com',
-      name: 'Google User Hunt',
+      name: 'Miming',
       token: 'mock_google_token_67890',
     );
   }
