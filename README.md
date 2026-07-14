@@ -1,3 +1,4 @@
+```
 lib/
 ├── main.dart                          # cuma runApp(), tipis
 │
@@ -43,3 +44,4 @@ lib/
 assets/
 ├── images/
 └── icons/
+```
