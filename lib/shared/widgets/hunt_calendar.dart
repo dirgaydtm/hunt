@@ -10,6 +10,7 @@ class HuntCalendar extends StatefulWidget {
   final bool showCategoryFilter;
   final List<Map<String, dynamic>>? events;
   final Function(String)? onCategoryChanged;
+  final Function(DateTime)? onMonthChanged;
   final String initialCategory;
   final RangeSelectionMode selectionMode;
 
@@ -19,6 +20,7 @@ class HuntCalendar extends StatefulWidget {
     this.showCategoryFilter = false,
     this.events,
     this.onCategoryChanged,
+    this.onMonthChanged,
     this.initialCategory = 'All',
     this.selectionMode = RangeSelectionMode.toggledOn,
   });
@@ -53,12 +55,11 @@ class _HuntCalendarState extends State<HuntCalendar> {
     _currentMonth = _start ?? DateTime.now();
   }
 
-  void _updateMonth(int offset) => setState(
-    () => _currentMonth = DateTime(
-      _currentMonth.year,
-      _currentMonth.month + offset,
-    ),
-  );
+  void _updateMonth(int offset) {
+    final newMonth = DateTime(_currentMonth.year, _currentMonth.month + offset);
+    setState(() => _currentMonth = newMonth);
+    widget.onMonthChanged?.call(newMonth);
+  }
 
   void _selectDates(DateTime? s, DateTime? e, DateTime focus) {
     setState(() {
@@ -88,26 +89,29 @@ class _HuntCalendarState extends State<HuntCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    final content = SingleChildScrollView(
-      padding: EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          SizedBox(height: 24),
-          _buildCalendar(),
-          SizedBox(height: 24),
-          _buildDateRangeDisplay(),
-        ],
-      ),
+    final inner = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildHeader(),
+        const SizedBox(height: 24),
+        _buildCalendar(),
+        const SizedBox(height: 24),
+        _buildDateRangeDisplay(),
+      ],
     );
+
+    final content = widget.showCategoryFilter
+        ? Padding(padding: const EdgeInsets.all(24), child: inner)
+        : SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: inner,
+          );
 
     return widget.showCategoryFilter
         ? Column(
-            children: [
-              Expanded(child: content),
-              _buildCategoryFilter(),
-            ],
+            mainAxisSize: MainAxisSize.min,
+            children: [content, _buildCategoryFilter()],
           )
         : content;
   }
@@ -167,7 +171,10 @@ class _HuntCalendarState extends State<HuntCalendar> {
     daysOfWeekHeight: 40,
     startingDayOfWeek: StartingDayOfWeek.sunday,
     availableGestures: AvailableGestures.horizontalSwipe,
-    onPageChanged: (d) => setState(() => _currentMonth = d),
+    onPageChanged: (d) {
+      setState(() => _currentMonth = d);
+      widget.onMonthChanged?.call(d);
+    },
     rangeSelectionMode: widget.selectionMode,
     rangeStartDay: _start,
     rangeEndDay: _end,
@@ -181,12 +188,21 @@ class _HuntCalendarState extends State<HuntCalendar> {
     calendarBuilders: CalendarBuilders(
       markerBuilder: (ctx, day, evs) {
         if (evs.isEmpty) return SizedBox();
+        final category =
+            (evs.first as Map)['category'] as String? ?? 'Beasiswa';
+        final gradient =
+            {
+              'Beasiswa': AppColors.blueGradient,
+              'Lomba': AppColors.yellowGradient,
+              'Magang': AppColors.greenGradient,
+            }[category] ??
+            AppColors.blueGradient;
         return Positioned.fill(
           child: Container(
             margin: EdgeInsets.all(6.0),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              gradient: (evs.first as Map)['gradient'],
+              gradient: gradient,
             ),
             alignment: Alignment.center,
             child: Text(
@@ -260,11 +276,8 @@ class _HuntCalendarState extends State<HuntCalendar> {
   );
 
   Widget _buildCategoryFilter() => Container(
-    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-    decoration: BoxDecoration(
-      color: AppColors.orangeNormal,
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-    ),
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+    color: AppColors.orangeNormal,
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

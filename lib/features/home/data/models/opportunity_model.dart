@@ -10,6 +10,7 @@ class OpportunityModel {
   final List<String>? syarat;
   final List<String>? berkas;
   final List<String>? ketentuan;
+  final DateTime? eventDate;
 
   const OpportunityModel({
     required this.title,
@@ -23,6 +24,7 @@ class OpportunityModel {
     this.syarat,
     this.berkas,
     this.ketentuan,
+    this.eventDate,
   });
 
   static List<OpportunityModel> get dummies => [
