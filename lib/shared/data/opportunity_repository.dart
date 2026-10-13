@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../constants/locations.dart';
 import '../models/opportunity_model.dart';
 import 'opportunity_service.dart';
 
@@ -91,7 +92,9 @@ class SearchFilters {
       return false;
     }
     if (category != 'Semua' && opp.category != category) return false;
-    if (locations.isNotEmpty && !locations.contains(opp.location)) {
+    if (locations.isNotEmpty &&
+        !locations.contains(opp.location) &&
+        !Locations.nationwide.contains(opp.location)) {
       return false;
     }
     final range = dateRange;

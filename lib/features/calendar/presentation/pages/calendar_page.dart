@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../../bookmark/presentation/widgets/bookmark_icon_button.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -130,6 +133,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                             padding: const EdgeInsets.only(bottom: 12),
                             child: OpportunityCard(
                               title: e.title,
+                              trailing: BookmarkIconButton(opportunity: e),
                               organizer: e.organizer,
                               category: e.category,
                               urgencyText: e.urgencyText(),

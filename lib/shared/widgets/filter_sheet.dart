@@ -4,7 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/date_time_extension.dart';
 import '../../../../shared/widgets/hunt_calendar.dart';
-import '../../../features/home/presentation/constants/home_constants.dart';
+import '../constants/locations.dart';
 import '../data/opportunity_repository.dart';
 import 'location_sheet.dart';
 import '../../../../shared/widgets/hunt_button.dart';
@@ -255,7 +255,7 @@ class _FilterSheetState extends State<FilterSheet> {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: HomeConstants.popularLocations.map((loc) {
+                    children: Locations.popular.map((loc) {
                       return _buildFilterChip(
                         label: loc,
                         isSelected: _selectedLocations.contains(loc),

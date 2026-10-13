@@ -4,7 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/hunt_button.dart';
 import '../../../../shared/widgets/hunt_text_field.dart';
-import '../../../features/home/presentation/constants/home_constants.dart';
+import '../constants/locations.dart';
 
 class LocationSheet extends StatefulWidget {
   final List<String> initialSelectedLocations;
@@ -89,7 +89,7 @@ class _LocationSheetState extends State<LocationSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredLocations = HomeConstants.allLocations
+    final filteredLocations = Locations.all
         .where(
           (location) =>
               location.toLowerCase().contains(_searchQuery.toLowerCase()),

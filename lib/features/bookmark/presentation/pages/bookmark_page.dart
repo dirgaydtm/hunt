@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../widgets/bookmark_icon_button.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -43,6 +46,7 @@ class BookmarkPage extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 16),
                       child: OpportunityCard(
                         title: item.title,
+                        trailing: BookmarkIconButton(opportunity: item),
                         organizer: item.organizer,
                         category: item.category,
                         urgencyText: item.urgencyText(),

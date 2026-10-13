@@ -34,7 +34,7 @@ values
   'https://beasiswaunggulan.kemdikbud.go.id', 'assets/mock/BeasiswaUnggulan.png', true
 ),
 (
-  'IT Fest 2026', 'KBMDSI FILKOM UB', 'lomba', 'Malang',
+  'IT Fest 2026', 'KBMDSI FILKOM UB', 'lomba', 'Kota Malang',
   'IT Fest 2026 adalah perlombaan teknologi tahunan tingkat nasional yang diselenggarakan oleh KBMDSI FILKOM Universitas Brawijaya. Acara ini merupakan ajang unjuk gigi bagi para inovator muda dalam memecahkan masalah nyata melalui solusi digital kreatif.',
   array[
     'Mahasiswa aktif D3/D4/S1 dari seluruh universitas di Indonesia.',
@@ -57,7 +57,7 @@ values
   null, 'assets/mock/ITfest.png', true
 ),
 (
-  'Backend Engineer Intern', 'Kata.ai', 'magang', 'Jakarta',
+  'Backend Engineer Intern', 'Kata.ai', 'magang', 'DKI Jakarta',
   'Bergabunglah sebagai Backend Engineer Intern di Kata.ai! Kamu akan terlibat langsung dalam pengembangan dan pemeliharaan arsitektur backend untuk produk-produk kecerdasan buatan kami. Kesempatan emas untuk belajar dari engineer berpengalaman.',
   array[
     'Mahasiswa tingkat akhir atau fresh graduate jurusan Ilmu Komputer/Teknologi Informasi.',

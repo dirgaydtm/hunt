@@ -12,7 +12,9 @@ class OpportunityCard extends StatelessWidget {
   final String category;
   final String? dateRange;
   final String? urgencyText;
-  final Widget? logo;
+
+  /// Optional action at the end of the card, e.g. a bookmark button.
+  final Widget? trailing;
   final String? imagePath;
   final VoidCallback? onTap;
   final bool hasBackground;
@@ -24,7 +26,7 @@ class OpportunityCard extends StatelessWidget {
     required this.category,
     this.dateRange,
     this.urgencyText,
-    this.logo,
+    this.trailing,
     this.imagePath,
     this.onTap,
     this.hasBackground = true,
@@ -51,25 +53,23 @@ class OpportunityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CategoryTheme.getTheme(category);
 
-    final finalLogo =
-        logo ??
-        (imagePath != null
-            ? Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  borderRadius: .circular(10),
-                  border: Border.all(color: AppColors.greyLightNormal),
-                ),
-                child: ClipRRect(
-                  borderRadius: .circular(9),
-                  child: Image(
-                    image: opportunityImage(imagePath!),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              )
-            : _buildFallbackLogo());
+    final finalLogo = imagePath != null
+        ? Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              borderRadius: .circular(10),
+              border: Border.all(color: AppColors.greyLightNormal),
+            ),
+            child: ClipRRect(
+              borderRadius: .circular(9),
+              child: Image(
+                image: opportunityImage(imagePath!),
+                fit: BoxFit.cover,
+              ),
+            ),
+          )
+        : _buildFallbackLogo();
 
     return GestureDetector(
       onTap: onTap,
@@ -166,6 +166,7 @@ class OpportunityCard extends StatelessWidget {
                 ],
               ),
             ),
+            ?trailing,
           ],
         ),
       ),

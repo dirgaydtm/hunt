@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/date_time_extension.dart';
+import '../../../../shared/constants/locations.dart';
 import '../../../../shared/data/opportunity_providers.dart';
 import '../../../../shared/models/opportunity_model.dart';
 import '../../../../shared/widgets/hunt_button.dart';
@@ -56,7 +57,6 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
   late final _organizer = TextEditingController(
     text: widget.existing?.organizer,
   );
-  late final _location = TextEditingController(text: widget.existing?.location);
   late final _description = TextEditingController(
     text: widget.existing?.description,
   );
@@ -65,6 +65,7 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
   );
 
   late String _category = widget.existing?.category ?? 'Beasiswa';
+  late String? _location = widget.existing?.location;
   late List<String> _syarat = widget.existing?.syarat ?? [];
   late List<String> _berkas = widget.existing?.berkas ?? [];
   late List<String> _ketentuan = widget.existing?.ketentuan ?? [];
@@ -79,7 +80,7 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
 
   @override
   void dispose() {
-    for (final c in [_title, _organizer, _location, _description, _url]) {
+    for (final c in [_title, _organizer, _description, _url]) {
       c.dispose();
     }
     super.dispose();
@@ -152,7 +153,7 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
       title: _title.text.trim(),
       organizer: _organizer.text.trim(),
       category: _category,
-      location: _trimOrNull(_location),
+      location: _location,
       description: _trimOrNull(_description),
       syarat: _syarat,
       berkas: _berkas,
@@ -310,11 +311,25 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
                 onSelectionChanged: (s) => setState(() => _category = s.first),
               ),
               const SizedBox(height: 16),
-              HuntTextField(
-                label: 'Lokasi',
-                hintText: 'Contoh: Malang, Jakarta, Nasional',
-                prefixIcon: Icons.place_outlined,
-                controller: _location,
+              DropdownButtonFormField<String>(
+                initialValue: _location,
+                isExpanded: true,
+                menuMaxHeight: 360,
+                decoration: const InputDecoration(
+                  labelText: 'Lokasi',
+                  prefixIcon: Icon(Icons.place_outlined),
+                  border: OutlineInputBorder(),
+                ),
+                items: [
+                  // keep legacy values selectable so editing doesn't drop them
+                  for (final loc in {
+                    ...Locations.nationwide,
+                    ...Locations.all,
+                    ?_location,
+                  })
+                    DropdownMenuItem(value: loc, child: Text(loc)),
+                ],
+                onChanged: (v) => setState(() => _location = v),
               ),
               const SizedBox(height: 16),
               _sectionTitle('Deskripsi'),

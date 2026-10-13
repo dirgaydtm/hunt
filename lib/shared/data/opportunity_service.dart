@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../constants/locations.dart';
+
 typedef JsonRow = Map<String, dynamic>;
 
 class OpportunityService {
@@ -43,7 +45,9 @@ class OpportunityService {
       );
     }
     if (category != null) q = q.eq('category', category);
-    if (locations.isNotEmpty) q = q.inFilter('location', locations);
+    if (locations.isNotEmpty) {
+      q = q.inFilter('location', [...locations, ...Locations.nationwide]);
+    }
     if (dateRange != null) {
       // registration window overlaps the picked range
       q = q

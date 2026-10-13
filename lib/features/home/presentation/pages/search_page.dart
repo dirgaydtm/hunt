@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
+import '../../../bookmark/presentation/widgets/bookmark_icon_button.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -182,6 +185,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                 padding: .only(bottom: 16),
                 child: OpportunityCard(
                   title: item.title,
+                  trailing: BookmarkIconButton(opportunity: item),
                   organizer: item.organizer,
                   category: item.category,
                   dateRange: item.dateRange,
