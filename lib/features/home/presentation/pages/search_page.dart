@@ -1,73 +1,67 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/hunt_text_field.dart';
 import '../../../../shared/widgets/opportunity_card.dart';
-import '../../data/models/opportunity_model.dart';
-import '../providers/home_provider.dart';
+import '../../../../shared/models/opportunity_model.dart';
+import '../../../../shared/data/opportunity_providers.dart';
+import '../../../../shared/data/opportunity_repository.dart';
 import '../../../../shared/widgets/filter_sheet.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
-  final String initialQuery;
+  final SearchFilters initialFilters;
 
-  const SearchPage({super.key, required this.initialQuery});
+  const SearchPage({super.key, this.initialFilters = const SearchFilters()});
 
   @override
   ConsumerState<SearchPage> createState() => _SearchPageState();
 }
 
 class _SearchPageState extends ConsumerState<SearchPage> {
-  late TextEditingController _searchController;
-  late String _query;
-  Map<String, dynamic>? _appliedFilters;
+  late final TextEditingController _searchController;
+  late SearchFilters _filters;
+  Timer? _debounce;
+
+  String get _query => _searchController.text;
 
   @override
   void initState() {
     super.initState();
-    _query = widget.initialQuery;
-    _searchController = TextEditingController(text: _query);
-    if (const ['beasiswa', 'lomba', 'magang'].contains(_query.toLowerCase())) {
-      _appliedFilters = {
-        'category': _query,
-        'locations': <String>[],
-        'date': DateTime(2026, 7, 9),
-      };
-    }
+    _filters = widget.initialFilters;
+    _searchController = TextEditingController(text: _filters.query);
   }
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
+  void _onQueryChanged(String value) {
+    setState(() {}); // refresh the clear button
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      setState(() => _filters = _filters.copyWith(query: value.trim()));
+    });
+  }
+
   void _showFilters() async {
-    final result = await showModalBottomSheet<Map<String, dynamic>>(
+    final result = await showModalBottomSheet<SearchFilters>(
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => FilterSheet(initialFilters: _appliedFilters),
+      builder: (context) => FilterSheet(initialFilters: _filters),
     );
-
-    if (result != null) {
-      setState(() {
-        _appliedFilters = result;
-        final selectedCat = result['category'] as String;
-        if (selectedCat != 'Semua') {
-          _query = selectedCat;
-          _searchController.text = selectedCat;
-        } else if (_query == 'Beasiswa' ||
-            _query == 'Lomba' ||
-            _query == 'Magang') {
-          _query = '';
-          _searchController.text = '';
-        }
-      });
-    }
+    if (result != null) setState(() => _filters = result);
   }
 
   Widget _buildSearchHeader() {
@@ -94,7 +88,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             child: HuntTextField(
               controller: _searchController,
               hintText: 'Cari peluang ...',
-              onChanged: (val) => setState(() => _query = val),
+              onChanged: _onQueryChanged,
               suffixIcon: Row(
                 mainAxisSize: .min,
                 mainAxisAlignment: .end,
@@ -108,13 +102,16 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       ),
                       onPressed: () {
                         _searchController.clear();
-                        setState(() => _query = '');
+                        _debounce?.cancel();
+                        setState(() => _filters = _filters.copyWith(query: ''));
                       },
                     ),
                   IconButton(
                     icon: Icon(
                       Icons.tune_rounded,
-                      color: AppColors.greyLightDark,
+                      color: _filters.hasFilters
+                          ? AppColors.blueNormal
+                          : AppColors.greyLightDark,
                       size: 18,
                     ),
                     onPressed: _showFilters,
@@ -129,8 +126,8 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     );
   }
 
-  Widget _buildContent(AsyncValue<List<OpportunityModel>> allOppsAsync) {
-    if (allOppsAsync.hasError) {
+  Widget _buildContent(AsyncValue<List<OpportunityModel>> resultsAsync) {
+    if (resultsAsync.hasError) {
       return Center(
         child: Text(
           'Gagal memuat peluang',
@@ -142,39 +139,16 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       );
     }
 
+    final isLoading = resultsAsync.isLoading && !resultsAsync.hasValue;
     return Skeletonizer(
-      enabled: allOppsAsync.isLoading,
+      enabled: isLoading,
       child: Builder(
         builder: (context) {
-          final allOpportunities = allOppsAsync.isLoading
+          final filteredList = isLoading
               ? OpportunityModel.dummies
-              : (allOppsAsync.value ?? []);
+              : (resultsAsync.value ?? const <OpportunityModel>[]);
 
-          final filteredList = allOppsAsync.isLoading
-              ? allOpportunities
-              : allOpportunities.where((opp) {
-                  final q = _query.toLowerCase();
-                  final matchQuery =
-                      q.isEmpty ||
-                      opp.title.toLowerCase().contains(q) ||
-                      opp.organizer.toLowerCase().contains(q) ||
-                      opp.category.toLowerCase().contains(q);
-
-                  final matchFilter =
-                      _appliedFilters == null ||
-                      ((_appliedFilters!['category'] == 'Semua' ||
-                              opp.category == _appliedFilters!['category']) &&
-                          (_appliedFilters!['locations'].isEmpty ||
-                              _appliedFilters!['locations'].any(
-                                (loc) =>
-                                    opp.title.toLowerCase().contains(loc) ||
-                                    opp.organizer.toLowerCase().contains(loc),
-                              )));
-
-                  return matchQuery && matchFilter;
-                }).toList();
-
-          if (filteredList.isEmpty && !allOppsAsync.isLoading) {
+          if (filteredList.isEmpty && !isLoading) {
             return Center(
               child: Column(
                 mainAxisAlignment: .center,
@@ -214,7 +188,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   imagePath: item.imagePath,
                   hasBackground: false,
                   onTap: () {
-                    context.push('/detail', extra: item);
+                    context.push('/opportunity/${item.id}', extra: item);
                   },
                 ),
               );
@@ -237,7 +211,9 @@ class _SearchPageState extends ConsumerState<SearchPage> {
               _buildSearchHeader(),
               SizedBox(height: 8),
               Expanded(
-                child: _buildContent(ref.watch(homeAllOpportunitiesProvider)),
+                child: _buildContent(
+                  ref.watch(searchResultsProvider(_filters)),
+                ),
               ),
             ],
           ),

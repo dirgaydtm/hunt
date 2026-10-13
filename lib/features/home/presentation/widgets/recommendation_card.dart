@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../../shared/widgets/opportunity_image.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/category_tag.dart';
 
@@ -35,7 +37,10 @@ class RecommendationCard extends StatelessWidget {
             children: [
               Positioned.fill(
                 child: imagePath != null
-                    ? Image.asset(imagePath!, fit: BoxFit.cover)
+                    ? Image(
+                        image: opportunityImage(imagePath!),
+                        fit: BoxFit.cover,
+                      )
                     : DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(

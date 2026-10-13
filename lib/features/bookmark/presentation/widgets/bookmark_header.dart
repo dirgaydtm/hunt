@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/hunt_text_field.dart';
+import '../../../../shared/data/opportunity_repository.dart';
 import '../../../../shared/widgets/filter_sheet.dart';
 import '../providers/bookmark_provider.dart';
 
@@ -19,7 +21,9 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
+    _searchController = TextEditingController(
+      text: ref.read(bookmarkSearchQueryProvider),
+    );
   }
 
   @override
@@ -28,14 +32,23 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
     super.dispose();
   }
 
-  void _showFilter(BuildContext context) {
-    showModalBottomSheet(
+  void _showFilter(BuildContext context) async {
+    final current = ref
+        .read(bookmarkFiltersProvider)
+        .copyWith(category: ref.read(bookmarkCategoryProvider));
+    final result = await showModalBottomSheet<SearchFilters>(
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const FilterSheet(),
+      builder: (context) => FilterSheet(initialFilters: current),
     );
+    if (result == null) return;
+    // Category lives in the header chips; the rest in bookmarkFilters.
+    ref.read(bookmarkCategoryProvider.notifier).setCategory(result.category);
+    ref
+        .read(bookmarkFiltersProvider.notifier)
+        .set(result.copyWith(category: 'Semua'));
   }
 
   @override

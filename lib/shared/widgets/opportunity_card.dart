@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'opportunity_image.dart';
+
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import 'category_tag.dart';
@@ -61,7 +63,10 @@ class OpportunityCard extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: .circular(9),
-                  child: Image.asset(imagePath!, fit: BoxFit.cover),
+                  child: Image(
+                    image: opportunityImage(imagePath!),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               )
             : _buildFallbackLogo());

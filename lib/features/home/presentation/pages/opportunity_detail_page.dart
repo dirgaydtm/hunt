@@ -1,16 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/category_tag.dart';
 import '../../../../shared/widgets/hunt_accordion.dart';
 import '../../../../shared/widgets/hunt_button.dart';
-import '../../data/models/opportunity_model.dart';
+import '../../../../shared/data/opportunity_providers.dart';
+import '../../../../shared/models/opportunity_model.dart';
+import '../../../../shared/widgets/opportunity_image.dart';
 
-class OpportunityDetailPage extends StatelessWidget {
+/// Loads the opportunity by id. [initial] (passed from a list) is shown
+/// immediately while the fresh copy loads.
+class OpportunityDetailPage extends ConsumerWidget {
+  final String id;
+  final OpportunityModel? initial;
+
+  const OpportunityDetailPage({super.key, required this.id, this.initial});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(opportunityByIdProvider(id));
+    final opportunity = async.value ?? initial;
+    if (opportunity != null) {
+      return _OpportunityDetailView(opportunity: opportunity);
+    }
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: async.isLoading
+            ? const CircularProgressIndicator()
+            : const Text('Peluang tidak ditemukan'),
+      ),
+    );
+  }
+}
+
+class _OpportunityDetailView extends StatelessWidget {
   final OpportunityModel opportunity;
 
-  const OpportunityDetailPage({super.key, required this.opportunity});
+  const _OpportunityDetailView({required this.opportunity});
+
+  Future<void> _openRegistration(BuildContext context) async {
+    final url = opportunity.registrationUrl;
+    final uri = url == null ? null : Uri.tryParse(url);
+    final opened =
+        uri != null &&
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Link pendaftaran belum tersedia.')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,33 +131,28 @@ class OpportunityDetailPage extends StatelessWidget {
                     ),
                     SizedBox(height: 24),
                   ],
-                  if (opportunity.syarat != null &&
-                      opportunity.syarat!.isNotEmpty)
+                  if (opportunity.syarat.isNotEmpty)
                     HuntAccordion(
                       title: 'Syarat',
                       leadingIcon: Icons.push_pin,
-                      items: opportunity.syarat!,
+                      items: opportunity.syarat,
                     ),
-                  if (opportunity.berkas != null &&
-                      opportunity.berkas!.isNotEmpty)
+                  if (opportunity.berkas.isNotEmpty)
                     HuntAccordion(
                       title: 'Berkas',
                       leadingIcon: Icons.description,
-                      items: opportunity.berkas!,
+                      items: opportunity.berkas,
                     ),
-                  if (opportunity.ketentuan != null &&
-                      opportunity.ketentuan!.isNotEmpty)
+                  if (opportunity.ketentuan.isNotEmpty)
                     HuntAccordion(
                       title: 'Ketentuan',
                       leadingIcon: Icons.campaign,
-                      items: opportunity.ketentuan!,
+                      items: opportunity.ketentuan,
                     ),
                   SizedBox(height: 32),
                   HuntButton(
                     text: 'Daftar Sekarang',
-                    onPressed: () {
-                      context.go('/home');
-                    },
+                    onPressed: () => _openRegistration(context),
                   ),
                 ],
               ),
@@ -145,7 +183,7 @@ class OpportunityDetailPage extends StatelessWidget {
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
         image: opportunity.imagePath != null
             ? DecorationImage(
-                image: AssetImage(opportunity.imagePath!),
+                image: opportunityImage(opportunity.imagePath!),
                 fit: BoxFit.cover,
               )
             : null,

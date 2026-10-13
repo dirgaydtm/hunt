@@ -6,7 +6,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/opportunity_card.dart';
-import '../../data/models/opportunity_model.dart';
+import '../../../../shared/models/opportunity_model.dart';
 import '../providers/home_provider.dart';
 import '../widgets/category_button.dart';
 import '../widgets/home_header.dart';
@@ -81,10 +81,13 @@ class HomePage extends ConsumerWidget {
                                               title: opp.title,
                                               organizer: opp.organizer,
                                               category: opp.category,
-                                              postedAt: opp.postedAt,
+                                              postedAt: opp.postedAt(),
                                               imagePath: opp.imagePath,
                                               onTap: () {
-                                                context.push('/detail', extra: opp);
+                                                context.push(
+                                                  '/opportunity/${opp.id}',
+                                                  extra: opp,
+                                                );
                                               },
                                             );
                                           })
@@ -148,10 +151,13 @@ class HomePage extends ConsumerWidget {
                                             title: opp.title,
                                             organizer: opp.organizer,
                                             category: opp.category,
-                                            urgencyText: opp.urgencyText,
+                                            urgencyText: opp.urgencyText(),
                                             imagePath: opp.imagePath,
                                             onTap: () {
-                                              context.push('/detail', extra: opp);
+                                              context.push(
+                                                '/opportunity/${opp.id}',
+                                                extra: opp,
+                                              );
                                             },
                                           );
                                         })

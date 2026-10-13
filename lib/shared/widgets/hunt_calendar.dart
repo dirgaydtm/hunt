@@ -11,6 +11,9 @@ class HuntCalendar extends StatefulWidget {
   final List<Map<String, dynamic>>? events;
   final Function(String)? onCategoryChanged;
   final Function(DateTime)? onMonthChanged;
+
+  /// Single-day mode only: the tapped day, or null when it is tapped again.
+  final Function(DateTime?)? onDaySelected;
   final String initialCategory;
   final RangeSelectionMode selectionMode;
 
@@ -21,7 +24,8 @@ class HuntCalendar extends StatefulWidget {
     this.events,
     this.onCategoryChanged,
     this.onMonthChanged,
-    this.initialCategory = 'All',
+    this.onDaySelected,
+    this.initialCategory = 'Semua',
     this.selectionMode = RangeSelectionMode.toggledOn,
   });
 
@@ -62,16 +66,26 @@ class _HuntCalendarState extends State<HuntCalendar> {
   }
 
   void _selectDates(DateTime? s, DateTime? e, DateTime focus) {
+    if (widget.selectionMode == RangeSelectionMode.toggledOff &&
+        s != null &&
+        _start != null &&
+        isSameDay(s, _start)) {
+      s = e = null;
+    }
+    if (widget.selectionMode == RangeSelectionMode.toggledOff) {
+      widget.onDaySelected?.call(s);
+    }
     setState(() {
       _start = s;
       _end = e;
       _currentMonth = focus;
     });
 
-    if (s != null && e != null && !widget.showCategoryFilter) {
+    final start = s, end = e;
+    if (start != null && end != null && !widget.showCategoryFilter) {
       final nav = Navigator.of(context);
       Future.delayed(Duration(milliseconds: 300), () {
-        if (mounted) nav.pop(DateTimeRange(start: s, end: e));
+        if (mounted) nav.pop(DateTimeRange(start: start, end: end));
       });
     }
   }
@@ -82,7 +96,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
           return d.year == day.year &&
               d.month == day.month &&
               d.day == day.day &&
-              (_category == 'All' || e['category'] == _category);
+              (_category == 'Semua' || e['category'] == _category);
         }).toList() ??
         [];
   }
@@ -178,6 +192,9 @@ class _HuntCalendarState extends State<HuntCalendar> {
     rangeSelectionMode: widget.selectionMode,
     rangeStartDay: _start,
     rangeEndDay: _end,
+    selectedDayPredicate: widget.selectionMode == RangeSelectionMode.toggledOff
+        ? (d) => _start != null && isSameDay(d, _start)
+        : null,
     onDaySelected: widget.selectionMode == RangeSelectionMode.toggledOff
         ? (s, f) => _selectDates(s, s, f)
         : null,
@@ -292,7 +309,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
           underline: SizedBox.shrink(),
           style: _ts(16, AppFontWeight.bold, Colors.white),
           items: [
-            'All',
+            'Semua',
             'Beasiswa',
             'Lomba',
             'Magang',

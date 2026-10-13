@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/date_time_extension.dart';
 import '../../../../shared/widgets/hunt_calendar.dart';
 import '../../../features/home/presentation/constants/home_constants.dart';
+import '../data/opportunity_repository.dart';
 import 'location_sheet.dart';
 import '../../../../shared/widgets/hunt_button.dart';
 
+/// Pops a [SearchFilters] (keeping the initial query) when applied.
 class FilterSheet extends StatefulWidget {
-  final Map<String, dynamic>? initialFilters;
+  final SearchFilters? initialFilters;
 
   const FilterSheet({super.key, this.initialFilters});
 
@@ -24,12 +27,11 @@ class _FilterSheetState extends State<FilterSheet> {
   @override
   void initState() {
     super.initState();
-    if (widget.initialFilters != null) {
-      _selectedCategory = widget.initialFilters!['category'] ?? 'Semua';
-      _selectedLocations = List<String>.from(
-        widget.initialFilters!['locations'] ?? [],
-      );
-      _selectedDateRange = widget.initialFilters!['date'] as DateTimeRange?;
+    final initial = widget.initialFilters;
+    if (initial != null) {
+      _selectedCategory = initial.category;
+      _selectedLocations = List.of(initial.locations);
+      _selectedDateRange = initial.dateRange;
     }
   }
 
@@ -324,11 +326,14 @@ class _FilterSheetState extends State<FilterSheet> {
               HuntButton(
                 text: 'Terapkan',
                 onPressed: () {
-                  Navigator.pop(context, {
-                    'category': _selectedCategory,
-                    'locations': _selectedLocations,
-                    'date': _selectedDateRange,
-                  });
+                  Navigator.pop(
+                    context,
+                    (widget.initialFilters ?? const SearchFilters()).copyWith(
+                      category: _selectedCategory,
+                      locations: List.of(_selectedLocations),
+                      dateRange: () => _selectedDateRange,
+                    ),
+                  );
                 },
               ),
 

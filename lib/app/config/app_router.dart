@@ -12,10 +12,11 @@ import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/home/presentation/pages/search_page.dart';
 import '../../features/home/presentation/pages/opportunity_detail_page.dart';
-import '../../features/home/data/models/opportunity_model.dart';
+import '../../shared/models/opportunity_model.dart';
 import '../../features/calendar/presentation/pages/calendar_page.dart';
 import '../../features/bookmark/presentation/pages/bookmark_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../shared/data/opportunity_repository.dart';
 import '../../shared/widgets/main_layout.dart';
 import 'auth_redirect.dart';
 
@@ -82,17 +83,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/search',
-        builder: (context, state) {
-          final query = state.extra as String? ?? '';
-          return SearchPage(initialQuery: query);
-        },
+        builder: (context, state) => SearchPage(
+          initialFilters:
+              state.extra as SearchFilters? ?? const SearchFilters(),
+        ),
       ),
       GoRoute(
-        path: '/detail',
-        builder: (context, state) {
-          final opp = state.extra as OpportunityModel;
-          return OpportunityDetailPage(opportunity: opp);
-        },
+        path: '/opportunity/:id',
+        builder: (context, state) => OpportunityDetailPage(
+          id: state.pathParameters['id']!,
+          initial: state.extra as OpportunityModel?,
+        ),
       ),
     ],
   );

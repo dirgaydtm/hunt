@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/opportunity_card.dart';
@@ -44,11 +45,11 @@ class BookmarkPage extends ConsumerWidget {
                         title: item.title,
                         organizer: item.organizer,
                         category: item.category,
-                        urgencyText: item.urgencyText,
+                        urgencyText: item.urgencyText(),
                         imagePath: item.imagePath,
                         hasBackground: true,
                         onTap: () {
-                          context.push('/detail', extra: item);
+                          context.push('/opportunity/${item.id}', extra: item);
                         },
                       ),
                     );

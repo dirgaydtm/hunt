@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../../shared/data/opportunity_repository.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
@@ -20,7 +22,8 @@ class CategoryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/search', extra: label),
+      onTap: () =>
+          context.push('/search', extra: SearchFilters(category: label)),
       child: Column(
         children: [
           Container(
