@@ -17,6 +17,9 @@ class HuntCalendar extends StatefulWidget {
   final String initialCategory;
   final RangeSelectionMode selectionMode;
 
+  /// Optional widget at the top-right, e.g. a notification bell.
+  final Widget? headerAction;
+
   const HuntCalendar({
     super.key,
     this.initialDateRange,
@@ -27,6 +30,7 @@ class HuntCalendar extends StatefulWidget {
     this.onDaySelected,
     this.initialCategory = 'Semua',
     this.selectionMode = RangeSelectionMode.toggledOn,
+    this.headerAction,
   });
 
   @override
@@ -159,21 +163,14 @@ class _HuntCalendarState extends State<HuntCalendar> {
           ),
         ],
       ),
-      Container(
-        decoration: BoxDecoration(
-          color: AppColors.blueNormalHover,
-          shape: BoxShape.circle,
-        ),
-        child: IconButton(
-          padding: .all(12),
-          icon: Icon(
-            Icons.notifications_rounded,
-            color: Colors.white,
-            size: 24,
+      if (widget.headerAction != null)
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.blueNormalHover,
+            shape: BoxShape.circle,
           ),
-          onPressed: () {},
+          child: widget.headerAction,
         ),
-      ),
     ],
   );
 

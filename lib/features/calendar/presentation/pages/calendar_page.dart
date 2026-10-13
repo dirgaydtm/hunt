@@ -8,6 +8,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/models/opportunity_model.dart';
 import '../../../../shared/widgets/hunt_calendar.dart';
 import '../../../../shared/widgets/opportunity_card.dart';
+import '../../../notifications/presentation/widgets/notification_bell.dart';
 import '../providers/calendar_provider.dart';
 
 const _kMonths = [
@@ -75,6 +76,10 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                 child: HuntCalendar(
                   events: markers,
                   showCategoryFilter: true,
+                  headerAction: const NotificationBell(
+                    icon: Icons.notifications_rounded,
+                    padding: EdgeInsets.all(12),
+                  ),
                   selectionMode: RangeSelectionMode.toggledOff,
                   initialCategory: category,
                   onCategoryChanged: (c) => ref

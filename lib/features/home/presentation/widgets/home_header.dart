@@ -7,6 +7,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../shared/data/opportunity_repository.dart';
 import '../../../../shared/widgets/filter_sheet.dart';
+import '../../../notifications/presentation/widgets/notification_bell.dart';
 import 'home_search_bar.dart';
 
 class HomeHeader extends ConsumerWidget {
@@ -77,22 +78,12 @@ class HomeHeader extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  Padding(
-                    padding: .all(12),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.notifications,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      onPressed: () {},
-                    ),
-                  ),
+                  Padding(padding: .all(12), child: const NotificationBell()),
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               HomeSearchBar(
-                onTap: () => context.push('/search', extra: ''),
+                onTap: () => context.push('/search'),
                 onFilterTap: () => _showFilter(context),
               ),
             ],

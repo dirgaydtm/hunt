@@ -6,6 +6,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/hunt_text_field.dart';
 import '../../../../shared/data/opportunity_repository.dart';
 import '../../../../shared/widgets/filter_sheet.dart';
+import '../../../notifications/presentation/widgets/notification_bell.dart';
 import '../providers/bookmark_provider.dart';
 
 class BookmarkHeader extends ConsumerStatefulWidget {
@@ -103,14 +104,7 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.notifications,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                  ),
+                  const NotificationBell(),
                 ],
               ),
               const SizedBox(height: 24),

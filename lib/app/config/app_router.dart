@@ -16,6 +16,7 @@ import '../../shared/models/opportunity_model.dart';
 import '../../features/calendar/presentation/pages/calendar_page.dart';
 import '../../features/bookmark/presentation/pages/bookmark_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/notifications/presentation/pages/notifications_page.dart';
 import '../../features/profile/presentation/pages/edit_profile_page.dart';
 import '../../shared/data/opportunity_repository.dart';
 import '../../shared/widgets/main_layout.dart';
@@ -83,21 +84,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
       GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsPage(),
+      ),
+      GoRoute(
         path: '/profile/edit',
         builder: (context, state) => const EditProfilePage(),
       ),
       GoRoute(
         path: '/search',
         builder: (context, state) => SearchPage(
-          initialFilters:
-              state.extra as SearchFilters? ?? const SearchFilters(),
+          initialFilters: switch (state.extra) {
+            final SearchFilters f => f,
+            _ => const SearchFilters(),
+          },
         ),
       ),
       GoRoute(
         path: '/opportunity/:id',
         builder: (context, state) => OpportunityDetailPage(
           id: state.pathParameters['id']!,
-          initial: state.extra as OpportunityModel?,
+          initial: switch (state.extra) {
+            final OpportunityModel o => o,
+            _ => null,
+          },
         ),
       ),
     ],
