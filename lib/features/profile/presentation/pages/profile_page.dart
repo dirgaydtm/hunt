@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/hunt_accordion.dart';
@@ -68,7 +70,7 @@ class ProfilePage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    user.university,
+                    user.university ?? 'Universitas belum diisi',
                     style: const TextStyle(
                       fontFamily: AppTextStyles.fontFamily,
                       fontSize: 14,
@@ -91,17 +93,19 @@ class ProfilePage extends ConsumerWidget {
                     items: const [],
                   ),
                   HuntAccordion(
-                    title: user.university,
+                    title: user.university ?? 'Universitas belum diisi',
                     leadingIcon: Icons.account_balance,
                     items: const [],
                   ),
                   HuntAccordion(
-                    title: user.major,
+                    title: user.major ?? 'Jurusan belum diisi',
                     leadingIcon: Icons.work_outline,
                     items: const [],
                   ),
                   HuntAccordion(
-                    title: user.graduationYear,
+                    title:
+                        user.graduationYear?.toString() ??
+                        'Tahun lulus belum diisi',
                     leadingIcon: Icons.calendar_today_outlined,
                     items: const [],
                   ),

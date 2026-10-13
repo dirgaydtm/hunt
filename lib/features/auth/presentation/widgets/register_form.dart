@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/hunt_text_field.dart';
 import '../../../../shared/widgets/hunt_button.dart';
@@ -34,23 +35,33 @@ class _RegisterFormState extends ConsumerState<RegisterForm> {
 
   void _handleRegister() async {
     if (_formKey.currentState!.validate()) {
-      final success = await ref
+      final result = await ref
           .read(authProvider.notifier)
           .register(
-            name: _nameController.text,
-            email: _emailController.text,
+            name: _nameController.text.trim(),
+            email: _emailController.text.trim(),
             password: _passwordController.text,
           );
-      if (success && mounted) {
+      if (!mounted) return;
+      if (result.error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.error!),
+            backgroundColor: AppColors.redNormal,
+          ),
+        );
+      } else if (result.needsConfirmation) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Registrasi Berhasil! Silakan masuk dengan akun baru Anda.',
+              'Registrasi berhasil! Cek email kamu untuk konfirmasi akun.',
             ),
             backgroundColor: AppColors.blueNormalActive,
           ),
         );
         context.pop();
+      } else {
+        context.go('/home');
       }
     }
   }

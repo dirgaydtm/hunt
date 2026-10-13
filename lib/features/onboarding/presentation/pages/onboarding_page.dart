@@ -1,20 +1,24 @@
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../../core/preferences/preferences_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../widgets/onboarding_slide.dart';
 import '../widgets/onboarding_button.dart';
 import '../constants/onboarding_constants.dart';
 
-class OnboardingPage extends StatefulWidget {
+class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
 
   @override
-  State<OnboardingPage> createState() => _OnboardingPageState();
+  ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> {
+class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final PageController _pageController = PageController();
   int _currentPageIndex = 0;
 
@@ -24,6 +28,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
     super.dispose();
   }
 
+  void _finish() {
+    ref.read(sharedPreferencesProvider).setBool(onboardingSeenKey, true);
+    context.go('/login');
+  }
+
   void _onNextPressed() {
     if (_currentPageIndex < onboardingSlides.length - 1) {
       _pageController.nextPage(
@@ -31,7 +40,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         curve: Curves.easeInOut,
       );
     } else {
-      context.go('/login');
+      _finish();
     }
   }
 
@@ -143,7 +152,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     ),
                     SizedBox(height: 20),
                     GestureDetector(
-                      onTap: () => context.go('/login'),
+                      onTap: _finish,
                       child: Text(
                         'Skip',
                         style: TextStyle(

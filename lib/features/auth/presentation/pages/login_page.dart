@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hunt/shared/widgets/divider.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/hunt_button.dart';
@@ -15,9 +16,11 @@ class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
 
   void _handleGoogleLogin(WidgetRef ref, BuildContext context) async {
-    final success = await ref.read(authProvider.notifier).loginWithGoogle();
-    if (success && context.mounted) {
-      context.go('/home');
+    final error = await ref.read(authProvider.notifier).loginWithGoogle();
+    if (error != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error), backgroundColor: AppColors.redNormal),
+      );
     }
   }
 

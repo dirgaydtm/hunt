@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/hunt_text_field.dart';
 import '../../../../shared/widgets/hunt_button.dart';
@@ -28,19 +29,15 @@ class _LoginFormState extends ConsumerState<LoginForm> {
 
   void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      final success = await ref
+      final error = await ref
           .read(authProvider.notifier)
-          .login(_emailController.text, _passwordController.text);
-      if (success && mounted) {
+          .login(_emailController.text.trim(), _passwordController.text);
+      if (!mounted) return;
+      if (error == null) {
         context.go('/home');
-      } else if (mounted) {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Login gagal. Gunakan: mahasiswa@hunt.com / password123',
-            ),
-            backgroundColor: AppColors.redNormal,
-          ),
+          SnackBar(content: Text(error), backgroundColor: AppColors.redNormal),
         );
       }
     }
@@ -99,7 +96,17 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               validator: (v) =>
                   v == null || v.length < 6 ? 'Minimal 6 karakter' : null,
             ),
-            SizedBox(height: 32),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => context.push('/forgot-password'),
+                child: Text(
+                  'Lupa kata sandi?',
+                  style: TextStyle(color: AppColors.blueNormalActive),
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
             Padding(
               padding: .symmetric(horizontal: 21),
               child: HuntButton(
