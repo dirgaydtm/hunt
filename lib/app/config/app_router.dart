@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/preferences/preferences_provider.dart';
+import '../../features/admin/presentation/pages/admin_page.dart';
+import '../../features/admin/presentation/pages/broadcast_page.dart';
+import '../../features/admin/presentation/pages/opportunity_form_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
@@ -80,6 +83,30 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/profile',
             builder: (context, state) => const ProfilePage(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/admin',
+        builder: (context, state) => const AdminPage(),
+        routes: [
+          GoRoute(
+            path: 'opportunities/new',
+            builder: (context, state) => const OpportunityFormPage(),
+          ),
+          GoRoute(
+            path: 'opportunities/:id/edit',
+            builder: (context, state) => OpportunityFormPage(
+              id: state.pathParameters['id'],
+              initial: switch (state.extra) {
+                final OpportunityModel o => o,
+                _ => null,
+              },
+            ),
+          ),
+          GoRoute(
+            path: 'broadcast',
+            builder: (context, state) => const BroadcastPage(),
           ),
         ],
       ),

@@ -79,10 +79,18 @@ class OpportunityService {
   Future<void> delete(String id) => _client.from(_table).delete().eq('id', id);
 
   Future<String> uploadImage(String fileName, List<int> bytes) async {
-    final path = '${DateTime.now().millisecondsSinceEpoch}_$fileName';
+    final safeName = fileName.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+    final ext = safeName.split('.').last.toLowerCase();
+    final path = '${DateTime.now().millisecondsSinceEpoch}_$safeName';
     await _client.storage
         .from(_bucket)
-        .uploadBinary(path, Uint8List.fromList(bytes));
+        .uploadBinary(
+          path,
+          Uint8List.fromList(bytes),
+          fileOptions: FileOptions(
+            contentType: 'image/${ext == 'jpg' ? 'jpeg' : ext}',
+          ),
+        );
     return path;
   }
 }

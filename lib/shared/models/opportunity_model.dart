@@ -26,6 +26,9 @@ class OpportunityModel {
 
   /// Either a bundled asset path (`assets/...`) or a full network URL.
   final String? imagePath;
+
+  /// The `image_path` column as stored (asset path or storage key).
+  final String? rawImagePath;
   final bool isRecommended;
   final bool isPublished;
   final DateTime? createdAt;
@@ -45,6 +48,7 @@ class OpportunityModel {
     this.eventDate,
     this.registrationUrl,
     this.imagePath,
+    this.rawImagePath,
     this.isRecommended = false,
     this.isPublished = true,
     this.createdAt,
@@ -81,6 +85,7 @@ class OpportunityModel {
       imagePath: image == null || image.startsWith('assets/')
           ? image
           : resolveImage?.call(image) ?? image,
+      rawImagePath: image,
       isRecommended: json['is_recommended'] as bool? ?? false,
       isPublished: json['is_published'] as bool? ?? true,
       createdAt: _date(json['created_at']),
