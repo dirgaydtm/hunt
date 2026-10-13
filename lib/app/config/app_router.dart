@@ -16,6 +16,7 @@ import '../../shared/models/opportunity_model.dart';
 import '../../features/calendar/presentation/pages/calendar_page.dart';
 import '../../features/bookmark/presentation/pages/bookmark_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/profile/presentation/pages/edit_profile_page.dart';
 import '../../shared/data/opportunity_repository.dart';
 import '../../shared/widgets/main_layout.dart';
 import 'auth_redirect.dart';
@@ -80,6 +81,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const ProfilePage(),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/profile/edit',
+        builder: (context, state) => const EditProfilePage(),
       ),
       GoRoute(
         path: '/search',

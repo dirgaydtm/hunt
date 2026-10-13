@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -24,7 +22,14 @@ class ProfilePage extends ConsumerWidget {
       );
     }
 
-    final imagePath = ref.watch(profileImageProvider);
+    final uploading = ref.watch(profileControllerProvider);
+
+    void showError(String? error) {
+      if (error == null || !context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error), backgroundColor: AppColors.redNormal),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -54,9 +59,13 @@ class ProfilePage extends ConsumerWidget {
               child: Column(
                 children: [
                   _Avatar(
-                    imagePath: imagePath,
-                    onEdit: () =>
-                        ref.read(profileImageProvider.notifier).pickImage(),
+                    imageUrl: user.avatarUrl,
+                    uploading: uploading,
+                    onEdit: () async => showError(
+                      await ref
+                          .read(profileControllerProvider.notifier)
+                          .pickAndUploadAvatar(),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -81,9 +90,22 @@ class ProfilePage extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _CircleIconButton(icon: Icons.notifications),
+                      _CircleIconButton(
+                        icon: Icons.notifications,
+                        onTap: () => context.push('/notifications'),
+                      ),
                       const SizedBox(width: 16),
-                      _CircleIconButton(icon: Icons.bookmark_border),
+                      _CircleIconButton(
+                        icon: Icons.bookmark_border,
+                        onTap: () => context.go('/bookmark'),
+                      ),
+                      if (user.isAdmin) ...[
+                        const SizedBox(width: 16),
+                        _CircleIconButton(
+                          icon: Icons.admin_panel_settings_outlined,
+                          onTap: () => context.push('/admin'),
+                        ),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 32),
@@ -126,9 +148,9 @@ class ProfilePage extends ConsumerWidget {
                               size: 18,
                               color: Colors.white,
                             ),
-                            onPressed: () {
-                              ref.read(authProvider.notifier).logout();
-                              context.go('/login');
+                            onPressed: () async {
+                              await ref.read(authProvider.notifier).logout();
+                              if (context.mounted) context.go('/login');
                             },
                           ),
                         ),
@@ -142,7 +164,7 @@ class ProfilePage extends ConsumerWidget {
                               size: 18,
                               color: AppColors.blueNormalActive,
                             ),
-                            onPressed: () {},
+                            onPressed: () => context.push('/profile/edit'),
                           ),
                         ),
                       ],
@@ -160,8 +182,13 @@ class ProfilePage extends ConsumerWidget {
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar({required this.imagePath, required this.onEdit});
-  final String? imagePath;
+  const _Avatar({
+    required this.imageUrl,
+    required this.uploading,
+    required this.onEdit,
+  });
+  final String? imageUrl;
+  final bool uploading;
   final VoidCallback onEdit;
 
   @override
@@ -176,14 +203,16 @@ class _Avatar extends StatelessWidget {
             shape: BoxShape.circle,
             color: AppColors.blueLightActive,
             border: Border.all(color: Colors.white, width: 4),
-            image: imagePath != null
+            image: imageUrl != null
                 ? DecorationImage(
-                    image: FileImage(File(imagePath!)),
+                    image: NetworkImage(imageUrl!),
                     fit: BoxFit.cover,
                   )
                 : null,
           ),
-          child: imagePath == null
+          child: uploading
+              ? const Center(child: CircularProgressIndicator())
+              : imageUrl == null
               ? const Icon(Icons.person, size: 50, color: AppColors.blueDark)
               : null,
         ),
@@ -191,7 +220,7 @@ class _Avatar extends StatelessWidget {
           bottom: 0,
           right: 0,
           child: GestureDetector(
-            onTap: onEdit,
+            onTap: uploading ? null : onEdit,
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: const BoxDecoration(
@@ -212,19 +241,24 @@ class _Avatar extends StatelessWidget {
 }
 
 class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({required this.icon});
+  const _CircleIconButton({required this.icon, required this.onTap});
   final IconData icon;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: const BoxDecoration(
-        color: AppColors.blueNormal,
-        shape: BoxShape.circle,
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: const BoxDecoration(
+          color: AppColors.blueNormal,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: Colors.white),
       ),
-      child: Icon(icon, color: Colors.white),
     );
   }
 }

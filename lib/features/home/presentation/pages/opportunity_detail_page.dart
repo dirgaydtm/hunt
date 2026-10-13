@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -8,6 +9,7 @@ import '../../../../shared/widgets/category_tag.dart';
 import '../../../../shared/widgets/hunt_accordion.dart';
 import '../../../../shared/widgets/hunt_button.dart';
 import '../../../../shared/data/opportunity_providers.dart';
+import '../../../bookmark/presentation/providers/bookmark_provider.dart';
 import '../../../../shared/models/opportunity_model.dart';
 import '../../../../shared/widgets/opportunity_image.dart';
 
@@ -41,6 +43,35 @@ class _OpportunityDetailView extends StatelessWidget {
   final OpportunityModel opportunity;
 
   const _OpportunityDetailView({required this.opportunity});
+
+  Future<void> _toggleBookmark(BuildContext context, WidgetRef ref) async {
+    final error = await ref
+        .read(bookmarksProvider.notifier)
+        .toggle(opportunity);
+    if (error != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error), backgroundColor: AppColors.redNormal),
+      );
+    }
+  }
+
+  void _share(BuildContext context) {
+    final box = context.findRenderObject() as RenderBox?;
+    SharePlus.instance.share(
+      ShareParams(
+        subject: opportunity.title,
+        text: [
+          '${opportunity.title} — ${opportunity.organizer}',
+          if (opportunity.dateRange != null) opportunity.dateRange!,
+          if (opportunity.registrationUrl != null) opportunity.registrationUrl!,
+          'Temukan peluang lainnya di Hunt!',
+        ].join('\n'),
+        sharePositionOrigin: box == null
+            ? null
+            : box.localToGlobal(Offset.zero) & box.size,
+      ),
+    );
+  }
 
   Future<void> _openRegistration(BuildContext context) async {
     final url = opportunity.registrationUrl;
@@ -219,12 +250,24 @@ class _OpportunityDetailView extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          _buildCircleBtn(
-                            icon: Icons.bookmark_border,
-                            onTap: () {},
+                          Consumer(
+                            builder: (context, ref, _) {
+                              final saved = ref.watch(
+                                isBookmarkedProvider(opportunity.id),
+                              );
+                              return _buildCircleBtn(
+                                icon: saved
+                                    ? Icons.bookmark
+                                    : Icons.bookmark_border,
+                                onTap: () => _toggleBookmark(context, ref),
+                              );
+                            },
                           ),
                           SizedBox(width: 12),
-                          _buildCircleBtn(icon: Icons.reply, onTap: () {}),
+                          _buildCircleBtn(
+                            icon: Icons.reply,
+                            onTap: () => _share(context),
+                          ),
                         ],
                       ),
                     ],
