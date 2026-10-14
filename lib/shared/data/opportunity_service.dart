@@ -28,7 +28,7 @@ class OpportunityService {
 
   Future<List<JsonRow>> getUpcomingDeadlines({int limit = 5}) => _published
       .gte('end_date', _iso(DateTime.now()))
-      .order('end_date')
+      .order('end_date', ascending: true)
       .limit(limit);
 
   Future<List<JsonRow>> search({
@@ -63,7 +63,7 @@ class OpportunityService {
     return _published
         .gte('event_date', _iso(first))
         .lte('event_date', _iso(last))
-        .order('event_date');
+        .order('event_date', ascending: true);
   }
 
   Future<JsonRow?> getById(String id) =>

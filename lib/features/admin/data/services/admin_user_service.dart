@@ -7,7 +7,7 @@ class AdminUserService {
 
   /// RLS only returns every profile to admins.
   Future<List<Map<String, dynamic>>> getAll() =>
-      _client.from('profiles').select().order('created_at');
+      _client.from('profiles').select().order('created_at', ascending: true);
 
   Future<void> setRole(String userId, String role) =>
       _client.from('profiles').update({'role': role}).eq('id', userId);

@@ -10,7 +10,7 @@ class NotificationService {
       .from('notifications')
       .stream(primaryKey: ['id'])
       .eq('user_id', userId)
-      .order('created_at')
+      .order('created_at', ascending: false)
       .limit(100);
 
   Future<void> markRead(String id) => _client
