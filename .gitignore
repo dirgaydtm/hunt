@@ -45,4 +45,7 @@ app.*.map.json
 /android/app/release
 
 # Supabase credentials
-env.json
+.env
+
+# Local database connection string (never commit)
+supabase/.db-url

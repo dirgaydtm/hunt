@@ -27,11 +27,11 @@ Aplikasi Flutter untuk mencari peluang mahasiswa: **Beasiswa**, **Lomba**, dan *
    - Manual: buka SQL Editor, jalankan isi `supabase/migrations/*.sql` berurutan, lalu `supabase/seed.sql`
 3. **Auth → URL Configuration**: tambahkan redirect URL `io.supabase.hunt://login-callback` (dipakai Google OAuth, konfirmasi email, dan reset password).
 4. *(Opsional)* **Auth → Providers → Google**: isi Client ID/Secret dari Google Cloud Console.
-5. **Konfigurasi app**: salin `env.example.json` menjadi `env.json` lalu isi nilainya. `env.json` tidak di-commit.
+5. **Konfigurasi app**: salin `.env.example` menjadi `.env` lalu isi `SUPABASE_URL` dan `SUPABASE_ANON_KEY`. `.env` tidak di-commit.
 6. **Jalankan**:
    ```bash
    flutter pub get
-   flutter run --dart-define-from-file=env.json
+   flutter run
    ```
 7. **Admin pertama**: daftar akun lewat app, lalu jalankan di SQL Editor:
    ```sql
@@ -58,7 +58,7 @@ lib/
 │       ├── app_router.dart   # go_router + guard login/admin
 │       └── auth_redirect.dart
 ├── core/
-│   ├── config/env.dart       # --dart-define values
+│   ├── config/env.dart       # baca .env (flutter_dotenv)
 │   ├── errors/failures.dart  # exception → pesan Indonesia
 │   ├── preferences/
 │   ├── supabase/

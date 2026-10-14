@@ -9,13 +9,10 @@ import 'core/preferences/preferences_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  assert(
-    Env.isConfigured,
-    'Run with --dart-define-from-file=env.json (see env.example.json)',
-  );
+  await Env.load();
   await Supabase.initialize(
     url: Env.supabaseUrl,
-    publishableKey: Env.supabasePublishableKey,
+    publishableKey: Env.supabaseAnonKey,
   );
   final prefs = await SharedPreferences.getInstance();
   runApp(
