@@ -200,7 +200,7 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
     if (confirmed != true) return;
     final error = await ref
         .read(adminControllerProvider.notifier)
-        .delete(widget.existing!.id);
+        .delete(widget.existing!);
     if (!mounted) return;
     if (error != null) return _snack(error, error: true);
     _snack('Peluang dihapus.');

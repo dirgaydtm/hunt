@@ -82,6 +82,9 @@ class OpportunityService {
 
   Future<void> delete(String id) => _client.from(_table).delete().eq('id', id);
 
+  Future<void> deleteImage(String path) =>
+      _client.storage.from(_bucket).remove([path]);
+
   Future<String> uploadImage(String fileName, List<int> bytes) async {
     final safeName = fileName.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
     final ext = safeName.split('.').last.toLowerCase();

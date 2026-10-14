@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/preferences/preferences_provider.dart';
 import '../../features/admin/presentation/pages/admin_page.dart';
+import '../../features/admin/presentation/pages/admin_users_page.dart';
 import '../../features/admin/presentation/pages/broadcast_page.dart';
 import '../../features/admin/presentation/pages/opportunity_form_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
@@ -103,6 +104,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                 _ => null,
               },
             ),
+          ),
+          GoRoute(
+            path: 'users',
+            builder: (context, state) => const AdminUsersPage(),
           ),
           GoRoute(
             path: 'broadcast',

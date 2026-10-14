@@ -54,6 +54,15 @@ class OpportunityRepository {
 
   Future<void> delete(String id) => _service.delete(id);
 
+  /// Removes an uploaded image; bundled assets are left alone.
+  /// Best effort: a leftover file must not fail the user's action.
+  Future<void> deleteImage(String path) async {
+    if (path.startsWith('assets/')) return;
+    try {
+      await _service.deleteImage(path);
+    } catch (_) {}
+  }
+
   Future<String> uploadImage(String fileName, List<int> bytes) =>
       _service.uploadImage(fileName, bytes);
 }

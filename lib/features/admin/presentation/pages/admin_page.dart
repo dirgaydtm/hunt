@@ -41,6 +41,11 @@ class _AdminPageState extends ConsumerState<AdminPage> {
         ),
         actions: [
           IconButton(
+            tooltip: 'Kelola pengguna',
+            icon: const Icon(Icons.people_outline),
+            onPressed: () => context.push('/admin/users'),
+          ),
+          IconButton(
             tooltip: 'Broadcast notifikasi',
             icon: const Icon(Icons.campaign_outlined),
             onPressed: () => context.push('/admin/broadcast'),
