@@ -22,10 +22,12 @@ class BookmarkService {
         .toList();
   }
 
+  /// Idempotent: an existing bookmark is left as is (there is no UPDATE
+  /// policy, so a merging upsert would be rejected by RLS).
   Future<void> add(String opportunityId) => _client.from('bookmarks').upsert({
     'user_id': _userId,
     'opportunity_id': opportunityId,
-  });
+  }, ignoreDuplicates: true);
 
   Future<void> remove(String opportunityId) => _client
       .from('bookmarks')
