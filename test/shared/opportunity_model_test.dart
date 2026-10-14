@@ -104,6 +104,13 @@ void main() {
       expect(const SearchFilters(locations: ['Malang']).matches(o), isTrue);
       expect(const SearchFilters(locations: ['Jakarta']).matches(o), isFalse);
     });
+    test('nationwide opportunities match any location filter', () {
+      final online = OpportunityModel.fromJson({
+        ...row(),
+        'location': 'Online',
+      });
+      expect(const SearchFilters(locations: ['Bali']).matches(online), isTrue);
+    });
     test('date range overlaps registration window', () {
       bool hit(DateTime s, DateTime e) => SearchFilters(
         dateRange: DateTimeRange(start: s, end: e),

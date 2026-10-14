@@ -68,11 +68,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           return MainLayout(child: child);
         },
         routes: [
-          GoRoute(
-            path: '/home',
-            builder: (context, state) =>
-                const HomePage(title: 'Hunt Home Page'),
-          ),
+          GoRoute(path: '/home', builder: (context, state) => const HomePage()),
           GoRoute(
             path: '/calendar',
             builder: (context, state) => const CalendarPage(),

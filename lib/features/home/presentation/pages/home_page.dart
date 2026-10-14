@@ -16,9 +16,7 @@ import '../widgets/home_header.dart';
 import '../widgets/recommendation_card.dart';
 
 class HomePage extends ConsumerWidget {
-  const HomePage({super.key, required this.title});
-
-  final String title;
+  const HomePage({super.key});
 
   Widget _buildSectionTitle(String text) {
     return Text(
