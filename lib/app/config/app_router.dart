@@ -7,29 +7,26 @@ import '../../features/admin/presentation/pages/admin_page.dart';
 import '../../features/admin/presentation/pages/admin_users_page.dart';
 import '../../features/admin/presentation/pages/broadcast_page.dart';
 import '../../features/admin/presentation/pages/opportunity_form_page.dart';
-import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
-import '../../features/auth/presentation/pages/forgot_password_page.dart';
-import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
-import '../../features/home/presentation/pages/home_page.dart';
-import '../../features/home/presentation/pages/search_page.dart';
-import '../../features/home/presentation/pages/opportunity_detail_page.dart';
-import '../../shared/models/opportunity_model.dart';
-import '../../features/calendar/presentation/pages/calendar_page.dart';
 import '../../features/bookmark/presentation/pages/bookmark_page.dart';
-import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/calendar/presentation/pages/calendar_page.dart';
+import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/home/presentation/pages/opportunity_detail_page.dart';
+import '../../features/home/presentation/pages/search_page.dart';
 import '../../features/notifications/presentation/pages/notifications_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/profile/presentation/pages/edit_profile_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../shared/data/opportunity_repository.dart';
+import '../../shared/models/opportunity_model.dart';
 import '../../shared/widgets/main_layout.dart';
 import 'auth_redirect.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier(0);
   ref.listen(authProvider, (_, _) => refresh.value++);
-  ref.listen(passwordRecoveryProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   final router = GoRouter(
@@ -43,53 +40,38 @@ final routerProvider = Provider<GoRouter>((ref) {
         onboardingSeen:
             ref.read(sharedPreferencesProvider).getBool(onboardingSeenKey) ??
             false,
-        recoveringPassword: ref.read(passwordRecoveryProvider),
         isAdmin: auth.value?.isAdmin ?? false,
         profileLoading: auth.isLoading,
       );
     },
     routes: [
-      GoRoute(path: '/', builder: (context, state) => const OnboardingPage()),
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-      GoRoute(
-        path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordPage(),
-      ),
-      GoRoute(
-        path: '/reset-password',
-        builder: (context, state) => const ResetPasswordPage(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => OnboardingPage()),
+      GoRoute(path: '/login', builder: (context, state) => LoginPage()),
+      GoRoute(path: '/register', builder: (context, state) => RegisterPage()),
       ShellRoute(
         builder: (context, state, child) {
           return MainLayout(child: child);
         },
         routes: [
-          GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+          GoRoute(path: '/home', builder: (context, state) => HomePage()),
           GoRoute(
             path: '/calendar',
-            builder: (context, state) => const CalendarPage(),
+            builder: (context, state) => CalendarPage(),
           ),
           GoRoute(
             path: '/bookmark',
-            builder: (context, state) => const BookmarkPage(),
+            builder: (context, state) => BookmarkPage(),
           ),
-          GoRoute(
-            path: '/profile',
-            builder: (context, state) => const ProfilePage(),
-          ),
+          GoRoute(path: '/profile', builder: (context, state) => ProfilePage()),
         ],
       ),
       GoRoute(
         path: '/admin',
-        builder: (context, state) => const AdminPage(),
+        builder: (context, state) => AdminPage(),
         routes: [
           GoRoute(
             path: 'opportunities/new',
-            builder: (context, state) => const OpportunityFormPage(),
+            builder: (context, state) => OpportunityFormPage(),
           ),
           GoRoute(
             path: 'opportunities/:id/edit',
@@ -101,30 +83,27 @@ final routerProvider = Provider<GoRouter>((ref) {
               },
             ),
           ),
-          GoRoute(
-            path: 'users',
-            builder: (context, state) => const AdminUsersPage(),
-          ),
+          GoRoute(path: 'users', builder: (context, state) => AdminUsersPage()),
           GoRoute(
             path: 'broadcast',
-            builder: (context, state) => const BroadcastPage(),
+            builder: (context, state) => BroadcastPage(),
           ),
         ],
       ),
       GoRoute(
         path: '/notifications',
-        builder: (context, state) => const NotificationsPage(),
+        builder: (context, state) => NotificationsPage(),
       ),
       GoRoute(
         path: '/profile/edit',
-        builder: (context, state) => const EditProfilePage(),
+        builder: (context, state) => EditProfilePage(),
       ),
       GoRoute(
         path: '/search',
         builder: (context, state) => SearchPage(
           initialFilters: switch (state.extra) {
             final SearchFilters f => f,
-            _ => const SearchFilters(),
+            _ => SearchFilters(),
           },
         ),
       ),

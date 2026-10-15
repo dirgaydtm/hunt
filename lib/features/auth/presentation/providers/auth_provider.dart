@@ -5,9 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/errors/failures.dart';
 import '../../../../core/supabase/supabase_provider.dart';
-import '../../data/services/auth_service.dart';
-import '../../data/repositories/auth_repository.dart';
 import '../../data/models/user_model.dart';
+import '../../data/repositories/auth_repository.dart';
+import '../../data/services/auth_service.dart';
 
 final authServiceProvider = Provider(
   (ref) => AuthService(ref.watch(supabaseClientProvider)),
@@ -15,19 +15,6 @@ final authServiceProvider = Provider(
 final authRepositoryProvider = Provider(
   (ref) => AuthRepository(ref.watch(authServiceProvider)),
 );
-
-/// Set when the user opens a password-reset link; the router then sends
-/// them to the new-password page.
-final passwordRecoveryProvider = NotifierProvider<PasswordRecovery, bool>(
-  PasswordRecovery.new,
-);
-
-class PasswordRecovery extends Notifier<bool> {
-  @override
-  bool build() => false;
-
-  void set(bool value) => state = value;
-}
 
 /// Holds the signed-in user's profile. `null` means signed out.
 ///
@@ -37,9 +24,6 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
   FutureOr<UserModel?> build() {
     final repo = ref.watch(authRepositoryProvider);
     final sub = repo.authStateChanges.listen((data) {
-      if (data.event == AuthChangeEvent.passwordRecovery) {
-        ref.read(passwordRecoveryProvider.notifier).set(true);
-      }
       if (data.event == AuthChangeEvent.signedIn ||
           data.event == AuthChangeEvent.signedOut ||
           data.event == AuthChangeEvent.userUpdated) {
@@ -65,7 +49,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
   Future<String?> _run(Future<void> Function() action) async {
     final previous = state;
-    state = const AsyncLoading<UserModel?>();
+    state = AsyncLoading<UserModel?>();
     try {
       await action();
       // Successful sign-in is picked up by the auth listener.
@@ -97,17 +81,6 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
           .register(name: name, email: email, password: password);
     });
     return (error: error, needsConfirmation: error == null && !signedIn);
-  }
-
-  Future<String?> sendPasswordReset(String email) =>
-      _run(() => ref.read(authRepositoryProvider).sendPasswordReset(email));
-
-  Future<String?> updatePassword(String password) async {
-    final error = await _run(
-      () => ref.read(authRepositoryProvider).updatePassword(password),
-    );
-    if (error == null) ref.read(passwordRecoveryProvider.notifier).set(false);
-    return error;
   }
 
   Future<void> logout() => ref.read(authRepositoryProvider).logout();

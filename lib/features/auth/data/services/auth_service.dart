@@ -46,14 +46,6 @@ class AuthService {
     return res.session != null;
   }
 
-  Future<void> sendPasswordReset(String email) {
-    return _client.auth.resetPasswordForEmail(email, redirectTo: _redirect);
-  }
-
-  Future<void> updatePassword(String password) {
-    return _client.auth.updateUser(UserAttributes(password: password));
-  }
-
   Future<void> logout() => _client.auth.signOut();
 
   Future<UserModel?> fetchProfile(String userId) async {

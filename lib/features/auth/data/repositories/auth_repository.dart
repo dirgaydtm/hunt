@@ -26,14 +26,6 @@ class AuthRepository {
     return _authService.register(name: name, email: email, password: password);
   }
 
-  Future<void> sendPasswordReset(String email) {
-    return _authService.sendPasswordReset(email);
-  }
-
-  Future<void> updatePassword(String password) {
-    return _authService.updatePassword(password);
-  }
-
   Future<void> logout() => _authService.logout();
 
   Future<UserModel?> fetchProfile(String userId) {

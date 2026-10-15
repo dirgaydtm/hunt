@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/hunt_text_field.dart';
 import '../../../../shared/widgets/hunt_button.dart';
+import '../../../../shared/widgets/hunt_text_field.dart';
 import '../providers/auth_provider.dart';
 
 class LoginForm extends ConsumerStatefulWidget {
@@ -48,7 +48,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     final isLoading = ref.watch(authProvider).isLoading;
 
     return Container(
-      padding: const .all(24.0),
+      padding: .all(24.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: .circular(28),
@@ -72,7 +72,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               hintText: 'Masukkan email ...',
               prefixIcon: Icons.email_outlined,
               controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: .emailAddress,
               validator: (v) =>
                   v == null || !v.contains('@') ? 'Email tidak valid' : null,
             ),
@@ -96,17 +96,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
               validator: (v) =>
                   v == null || v.length < 6 ? 'Minimal 6 karakter' : null,
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => context.push('/forgot-password'),
-                child: Text(
-                  'Lupa kata sandi?',
-                  style: TextStyle(color: AppColors.blueNormalActive),
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
+            SizedBox(height: 32),
             Padding(
               padding: .symmetric(horizontal: 21),
               child: HuntButton(

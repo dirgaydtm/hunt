@@ -5,14 +5,12 @@ String? redirect(
   String location, {
   bool loggedIn = false,
   bool onboardingSeen = false,
-  bool recovering = false,
   bool isAdmin = false,
   bool profileLoading = false,
 }) => authRedirect(
   location: location,
   loggedIn: loggedIn,
   onboardingSeen: onboardingSeen,
-  recoveringPassword: recovering,
   isAdmin: isAdmin,
   profileLoading: profileLoading,
 );
@@ -28,7 +26,6 @@ void main() {
     test('allows auth pages', () {
       expect(redirect('/login'), isNull);
       expect(redirect('/register'), isNull);
-      expect(redirect('/forgot-password'), isNull);
     });
     test('blocks app pages', () {
       expect(redirect('/home'), '/login');
@@ -43,16 +40,6 @@ void main() {
     });
     test('allows app pages', () {
       expect(redirect('/home', loggedIn: true), isNull);
-    });
-    test('forces reset page during password recovery', () {
-      expect(
-        redirect('/home', loggedIn: true, recovering: true),
-        '/reset-password',
-      );
-      expect(
-        redirect('/reset-password', loggedIn: true, recovering: true),
-        isNull,
-      );
     });
     test('blocks admin for regular users', () {
       expect(redirect('/admin', loggedIn: true), '/home');
