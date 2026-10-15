@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-
-import '../../../bookmark/presentation/widgets/bookmark_icon_button.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../shared/widgets/opportunity_card.dart';
 import '../../../../shared/models/opportunity_model.dart';
+import '../../../../shared/widgets/opportunity_card.dart';
 import '../providers/home_provider.dart';
 import '../widgets/category_button.dart';
 import '../widgets/home_header.dart';
@@ -53,9 +50,9 @@ class HomePage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: .start,
           children: [
-            const HomeHeader(),
+            HomeHeader(),
             Padding(
-              padding: const .all(32),
+              padding: .all(32),
               child: Column(
                 crossAxisAlignment: .start,
                 spacing: 36,
@@ -72,8 +69,8 @@ class HomePage extends ConsumerWidget {
                               child: SizedBox(
                                 height: 108,
                                 child: ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const BouncingScrollPhysics(),
+                                  scrollDirection: .horizontal,
+                                  physics: BouncingScrollPhysics(),
                                   children:
                                       (recommendationsAsync.value ??
                                               OpportunityModel.dummies)
@@ -105,10 +102,10 @@ class HomePage extends ConsumerWidget {
                     children: [
                       _buildSectionTitle('Kategori'),
                       Padding(
-                        padding: const .symmetric(horizontal: 20),
+                        padding: .symmetric(horizontal: 20),
                         child: Row(
                           mainAxisAlignment: .spaceBetween,
-                          children: const [
+                          children: [
                             CategoryButton(
                               label: 'Beasiswa',
                               icon: Icons.school_outlined,
@@ -150,9 +147,6 @@ class HomePage extends ConsumerWidget {
                                         .map((opp) {
                                           return OpportunityCard(
                                             title: opp.title,
-                                            trailing: BookmarkIconButton(
-                                              opportunity: opp,
-                                            ),
                                             organizer: opp.organizer,
                                             category: opp.category,
                                             urgencyText: opp.urgencyText(),

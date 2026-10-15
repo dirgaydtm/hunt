@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'opportunity_image.dart';
-
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import 'category_tag.dart';
+import 'opportunity_image.dart';
 
 class OpportunityCard extends StatelessWidget {
   final String title;
@@ -13,8 +12,7 @@ class OpportunityCard extends StatelessWidget {
   final String? dateRange;
   final String? urgencyText;
 
-  /// Optional action at the end of the card, e.g. a bookmark button.
-  final Widget? trailing;
+  final Widget? logo;
   final String? imagePath;
   final VoidCallback? onTap;
   final bool hasBackground;
@@ -26,7 +24,7 @@ class OpportunityCard extends StatelessWidget {
     required this.category,
     this.dateRange,
     this.urgencyText,
-    this.trailing,
+    this.logo,
     this.imagePath,
     this.onTap,
     this.hasBackground = true,
@@ -44,7 +42,7 @@ class OpportunityCard extends StatelessWidget {
     return Container(
       width: 48,
       height: 48,
-      decoration: BoxDecoration(color: theme.light, shape: BoxShape.circle),
+      decoration: BoxDecoration(color: theme.light, shape: .circle),
       child: Icon(icon, size: 24, color: theme.normal),
     );
   }
@@ -53,28 +51,30 @@ class OpportunityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CategoryTheme.getTheme(category);
 
-    final finalLogo = imagePath != null
-        ? Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              borderRadius: .circular(10),
-              border: Border.all(color: AppColors.greyLightNormal),
-            ),
-            child: ClipRRect(
-              borderRadius: .circular(9),
-              child: Image(
-                image: opportunityImage(imagePath!),
-                fit: BoxFit.cover,
-              ),
-            ),
-          )
-        : _buildFallbackLogo();
+    final finalLogo =
+        logo ??
+        (imagePath != null
+            ? Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  borderRadius: .circular(10),
+                  border: .all(color: AppColors.greyLightNormal),
+                ),
+                child: ClipRRect(
+                  borderRadius: .circular(9),
+                  child: Image(
+                    image: opportunityImage(imagePath!),
+                    fit: .cover,
+                  ),
+                ),
+              )
+            : _buildFallbackLogo());
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const .symmetric(horizontal: 14, vertical: 12),
+        padding: .symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: hasBackground ? theme.light : Colors.transparent,
           borderRadius: .circular(24),
@@ -107,11 +107,8 @@ class OpportunityCard extends StatelessWidget {
                           CategoryTag(category: category),
                           if (urgencyText != null)
                             Container(
-                              margin: const .only(left: 8),
-                              padding: const .symmetric(
-                                horizontal: 10,
-                                vertical: 3,
-                              ),
+                              margin: .only(left: 8),
+                              padding: .symmetric(horizontal: 10, vertical: 3),
                               decoration: BoxDecoration(
                                 color: AppColors.orangeLight,
                                 border: .all(color: AppColors.orangeNormal),
@@ -144,7 +141,7 @@ class OpportunityCard extends StatelessWidget {
                   Text(
                     title,
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    overflow: .ellipsis,
                     style: TextStyle(
                       fontFamily: AppTextStyles.fontFamily,
                       fontSize: 12,
@@ -156,7 +153,7 @@ class OpportunityCard extends StatelessWidget {
                   Text(
                     organizer,
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    overflow: .ellipsis,
                     style: TextStyle(
                       fontFamily: AppTextStyles.fontFamily,
                       fontSize: 10,
@@ -166,7 +163,6 @@ class OpportunityCard extends StatelessWidget {
                 ],
               ),
             ),
-            ?trailing,
           ],
         ),
       ),

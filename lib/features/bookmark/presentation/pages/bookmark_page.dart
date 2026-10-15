@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../widgets/bookmark_icon_button.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,12 +19,12 @@ class BookmarkPage extends ConsumerWidget {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          const BookmarkHeader(),
+          BookmarkHeader(),
           Expanded(
             child: asyncBookmarks.when(
               data: (bookmarks) {
                 if (bookmarks.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
                       'Tidak ada bookmark di kategori ini.',
                       style: TextStyle(
@@ -38,15 +35,14 @@ class BookmarkPage extends ConsumerWidget {
                   );
                 }
                 return ListView.builder(
-                  padding: const EdgeInsets.all(24),
+                  padding: .all(24),
                   itemCount: bookmarks.length,
                   itemBuilder: (context, index) {
                     final item = bookmarks[index];
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
+                      padding: .only(bottom: 16),
                       child: OpportunityCard(
                         title: item.title,
-                        trailing: BookmarkIconButton(opportunity: item),
                         organizer: item.organizer,
                         category: item.category,
                         urgencyText: item.urgencyText(),
@@ -60,7 +56,7 @@ class BookmarkPage extends ConsumerWidget {
                   },
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: CircularProgressIndicator()),
               error: (e, st) => Center(child: Text('Error: $e')),
             ),
           ),

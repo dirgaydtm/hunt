@@ -16,7 +16,7 @@ class ProfilePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).value;
     if (user == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: Colors.white,
         body: Center(child: CircularProgressIndicator()),
       );
@@ -42,8 +42,8 @@ class ProfilePage extends ConsumerWidget {
                 width: double.infinity,
                 height: 220,
                 color: AppColors.blueNormal,
-                alignment: const Alignment(0, -0.2),
-                child: const Text(
+                alignment: Alignment(0, -0.2),
+                child: Text(
                   'Profile',
                   style: TextStyle(
                     fontFamily: AppTextStyles.fontFamily,
@@ -55,7 +55,7 @@ class ProfilePage extends ConsumerWidget {
               ),
             ),
             Transform.translate(
-              offset: const Offset(0, -50),
+              offset: Offset(0, -50),
               child: Column(
                 children: [
                   _Avatar(
@@ -67,40 +67,37 @@ class ProfilePage extends ConsumerWidget {
                           .pickAndUploadAvatar(),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Text(
                     user.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: AppTextStyles.fontFamily,
                       fontSize: 18,
                       fontWeight: AppFontWeight.bold,
                       color: AppColors.blueDarkActive,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     user.university ?? 'Universitas belum diisi',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: AppTextStyles.fontFamily,
                       fontSize: 14,
                       color: AppColors.blueDark,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: .center,
                     children: [
                       _CircleIconButton(
                         icon: Icons.notifications,
                         onTap: () => context.push('/notifications'),
                       ),
-                      const SizedBox(width: 16),
-                      _CircleIconButton(
-                        icon: Icons.bookmark_border,
-                        onTap: () => context.go('/bookmark'),
-                      ),
+                      SizedBox(width: 16),
+                      _CircleIconButton(icon: Icons.bookmark_border),
                       if (user.isAdmin) ...[
-                        const SizedBox(width: 16),
+                        SizedBox(width: 16),
                         _CircleIconButton(
                           icon: Icons.admin_panel_settings_outlined,
                           onTap: () => context.push('/admin'),
@@ -108,42 +105,42 @@ class ProfilePage extends ConsumerWidget {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32),
                   HuntAccordion(
                     title: user.email,
                     leadingIcon: Icons.mail_outline,
-                    items: const [],
+                    items: [],
                   ),
                   HuntAccordion(
                     title: user.university ?? 'Universitas belum diisi',
                     leadingIcon: Icons.account_balance,
-                    items: const [],
+                    items: [],
                   ),
                   HuntAccordion(
                     title: user.major ?? 'Jurusan belum diisi',
                     leadingIcon: Icons.work_outline,
-                    items: const [],
+                    items: [],
                   ),
                   HuntAccordion(
                     title:
                         user.graduationYear?.toString() ??
                         'Tahun lulus belum diisi',
                     leadingIcon: Icons.calendar_today_outlined,
-                    items: const [],
+                    items: [],
                   ),
                   Divider(
                     height: 1,
                     color: AppColors.blueLightActive.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 40),
+                  SizedBox(height: 40),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 46),
+                    padding: .symmetric(horizontal: 46),
                     child: Row(
                       children: [
                         Expanded(
                           child: HuntButton(
                             text: 'Logout',
-                            leading: const Icon(
+                            leading: Icon(
                               Icons.logout,
                               size: 18,
                               color: Colors.white,
@@ -154,12 +151,12 @@ class ProfilePage extends ConsumerWidget {
                             },
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(width: 16),
                         Expanded(
                           child: HuntButton(
                             text: 'Edit Profile',
                             isOutlined: true,
-                            leading: const Icon(
+                            leading: Icon(
                               Icons.edit,
                               size: 18,
                               color: AppColors.blueNormalActive,
@@ -170,7 +167,7 @@ class ProfilePage extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  SizedBox(height: 40),
                 ],
               ),
             ),
@@ -194,26 +191,23 @@ class _Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      clipBehavior: Clip.none,
+      clipBehavior: .none,
       children: [
         Container(
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
+            shape: .circle,
             color: AppColors.blueLightActive,
-            border: Border.all(color: Colors.white, width: 4),
+            border: .all(color: Colors.white, width: 4),
             image: imageUrl != null
-                ? DecorationImage(
-                    image: NetworkImage(imageUrl!),
-                    fit: BoxFit.cover,
-                  )
+                ? DecorationImage(image: NetworkImage(imageUrl!), fit: .cover)
                 : null,
           ),
           child: uploading
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator())
               : imageUrl == null
-              ? const Icon(Icons.person, size: 50, color: AppColors.blueDark)
+              ? Icon(Icons.person, size: 50, color: AppColors.blueDark)
               : null,
         ),
         Positioned(
@@ -222,12 +216,12 @@ class _Avatar extends StatelessWidget {
           child: GestureDetector(
             onTap: uploading ? null : onEdit,
             child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
+              padding: .all(6),
+              decoration: BoxDecoration(
                 color: Color(0xFFFBF4D8),
-                shape: BoxShape.circle,
+                shape: .circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.edit,
                 size: 16,
                 color: AppColors.greyDarkNormalActive,
@@ -241,22 +235,19 @@ class _Avatar extends StatelessWidget {
 }
 
 class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({required this.icon, required this.onTap});
+  const _CircleIconButton({required this.icon, this.onTap});
   final IconData icon;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      customBorder: const CircleBorder(),
+      customBorder: CircleBorder(),
       child: Container(
         width: 48,
         height: 48,
-        decoration: const BoxDecoration(
-          color: AppColors.blueNormal,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: AppColors.blueNormal, shape: .circle),
         child: Icon(icon, color: Colors.white),
       ),
     );
