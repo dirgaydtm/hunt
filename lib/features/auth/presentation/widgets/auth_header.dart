@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_colors.dart';
 
 class AuthHeader extends StatelessWidget {
@@ -18,22 +19,21 @@ class AuthHeader extends StatelessWidget {
   }
 }
 
+const _edge = 40, _dip = 40;
+
 class _HeaderCurveClipper extends CustomClipper<Path> {
   @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0, size.height - 80);
-    path.quadraticBezierTo(
+  Path getClip(Size size) => Path()
+    ..lineTo(0, size.height - _edge)
+    ..quadraticBezierTo(
       size.width / 2,
-      size.height + 80,
+      size.height - _edge + 2 * _dip,
       size.width,
-      size.height - 80,
-    );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
+      size.height - _edge,
+    )
+    ..lineTo(size.width, 0)
+    ..close();
 
   @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => true;
 }

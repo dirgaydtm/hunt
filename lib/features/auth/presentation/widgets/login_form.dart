@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/hunt_button.dart';
-import '../../../../shared/widgets/hunt_text_field.dart';
 import '../providers/auth_provider.dart';
+import 'auth_fields.dart';
 
 class LoginForm extends ConsumerStatefulWidget {
   const LoginForm({super.key});
@@ -18,7 +17,6 @@ class _LoginFormState extends ConsumerState<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -44,70 +42,14 @@ class _LoginFormState extends ConsumerState<LoginForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final isLoading = ref.watch(authProvider).isLoading;
-
-    return Container(
-      padding: .all(24.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: .circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x3F00A9B8),
-            blurRadius: 32,
-            offset: Offset(0, 0),
-            spreadRadius: 3,
-          ),
-        ],
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: .start,
-          children: [
-            SizedBox(height: 18),
-            HuntTextField(
-              label: 'Email',
-              hintText: 'Masukkan email ...',
-              prefixIcon: Icons.email_outlined,
-              controller: _emailController,
-              keyboardType: .emailAddress,
-              validator: (v) =>
-                  v == null || !v.contains('@') ? 'Email tidak valid' : null,
-            ),
-            SizedBox(height: 20),
-            HuntTextField(
-              label: 'Kata Sandi',
-              hintText: 'Masukkan kata sandi ...',
-              prefixIcon: Icons.vpn_key_outlined,
-              controller: _passwordController,
-              obscureText: _obscurePassword,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  color: AppColors.greyLightDark,
-                ),
-                onPressed: () =>
-                    setState(() => _obscurePassword = !_obscurePassword),
-              ),
-              validator: (v) =>
-                  v == null || v.length < 6 ? 'Minimal 6 karakter' : null,
-            ),
-            SizedBox(height: 32),
-            Padding(
-              padding: .symmetric(horizontal: 21),
-              child: HuntButton(
-                text: 'Masuk Sekarang',
-                isLoading: isLoading,
-                onPressed: _handleLogin,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => AuthCard(
+    formKey: _formKey,
+    submitText: 'Masuk Sekarang',
+    isLoading: ref.watch(authProvider).isLoading,
+    onSubmit: _handleLogin,
+    fields: [
+      EmailField(controller: _emailController),
+      PasswordField(controller: _passwordController),
+    ],
+  );
 }
