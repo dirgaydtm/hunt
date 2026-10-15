@@ -9,6 +9,7 @@ String? authRedirect({
   required bool isAdmin,
   required bool profileLoading,
 }) {
+  if (location == '/splash') return null;
   final isPublic = _publicRoutes.contains(location);
 
   if (!loggedIn) {

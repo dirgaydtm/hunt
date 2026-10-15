@@ -16,6 +16,11 @@ String? redirect(
 );
 
 void main() {
+  test('never redirects away from splash', () {
+    expect(redirect('/splash'), isNull);
+    expect(redirect('/splash', loggedIn: true, isAdmin: true), isNull);
+  });
+
   group('signed out', () {
     test('shows onboarding on first launch', () {
       expect(redirect('/'), isNull);

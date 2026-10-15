@@ -19,6 +19,7 @@ import '../../features/notifications/presentation/pages/notifications_page.dart'
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/profile/presentation/pages/edit_profile_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../shared/data/opportunity_repository.dart';
 import '../../shared/models/opportunity_model.dart';
 import '../../shared/widgets/main_layout.dart';
@@ -30,7 +31,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.onDispose(refresh.dispose);
 
   final router = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash',
     refreshListenable: refresh,
     redirect: (context, state) {
       final auth = ref.read(authProvider);
@@ -45,6 +46,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       );
     },
     routes: [
+      GoRoute(path: '/splash', builder: (context, state) => SplashPage()),
       GoRoute(path: '/', builder: (context, state) => OnboardingPage()),
       GoRoute(path: '/login', builder: (context, state) => LoginPage()),
       GoRoute(path: '/register', builder: (context, state) => RegisterPage()),
