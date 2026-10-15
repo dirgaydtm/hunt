@@ -53,5 +53,9 @@ void main() {
         isNull,
       );
     });
+    test('blocks bookmark for admins', () {
+      expect(redirect('/bookmark', loggedIn: true, isAdmin: true), '/home');
+      expect(redirect('/bookmark', loggedIn: true), isNull);
+    });
   });
 }

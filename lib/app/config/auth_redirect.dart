@@ -21,5 +21,6 @@ String? authRedirect({
   if (location.startsWith('/admin') && !isAdmin && !profileLoading) {
     return '/home';
   }
+  if (location.startsWith('/bookmark') && isAdmin) return '/home';
   return null;
 }

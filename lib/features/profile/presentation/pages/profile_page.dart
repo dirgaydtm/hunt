@@ -29,12 +29,15 @@ class ProfilePage extends ConsumerWidget {
     final university = user.university ?? 'Universitas belum diisi';
     final info = [
       (Icons.mail_outline, user.email),
-      (Icons.account_balance, university),
-      (Icons.work_outline, user.major ?? 'Jurusan belum diisi'),
-      (
-        Icons.calendar_today_outlined,
-        user.graduationYear?.toString() ?? 'Tahun lulus belum diisi',
-      ),
+      // Student details don't apply to admins.
+      if (!user.isAdmin) ...[
+        (Icons.account_balance, university),
+        (Icons.work_outline, user.major ?? 'Jurusan belum diisi'),
+        (
+          Icons.calendar_today_outlined,
+          user.graduationYear?.toString() ?? 'Tahun lulus belum diisi',
+        ),
+      ],
     ];
 
     Future<void> changeAvatar() async {
@@ -89,7 +92,8 @@ class ProfilePage extends ConsumerWidget {
                       AppColors.blueDarkActive,
                     ),
                   ),
-                  Text(university, style: _ts(14, null, AppColors.blueDark)),
+                  if (!user.isAdmin)
+                    Text(university, style: _ts(14, null, AppColors.blueDark)),
                   Row(
                     mainAxisAlignment: .center,
                     spacing: 16,

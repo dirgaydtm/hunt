@@ -9,6 +9,7 @@ import '../../../../shared/widgets/category_tag.dart';
 import '../../../../shared/widgets/hunt_accordion.dart';
 import '../../../../shared/widgets/hunt_button.dart';
 import '../../../../shared/data/opportunity_providers.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../bookmark/presentation/providers/bookmark_provider.dart';
 import '../../../../shared/models/opportunity_model.dart';
 import '../../../../shared/widgets/opportunity_image.dart';
@@ -252,6 +253,10 @@ class _OpportunityDetailView extends StatelessWidget {
                         children: [
                           Consumer(
                             builder: (context, ref, _) {
+                              if (ref.watch(authProvider).value?.isAdmin ??
+                                  false) {
+                                return SizedBox.shrink();
+                              }
                               final saved = ref.watch(
                                 isBookmarkedProvider(opportunity.id),
                               );

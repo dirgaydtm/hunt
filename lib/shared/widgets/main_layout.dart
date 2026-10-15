@@ -1,30 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
 
-class MainLayout extends StatelessWidget {
+const _tabs = [
+  ('/home', Icons.home_outlined, Icons.home, 'Home'),
+  (
+    '/calendar',
+    Icons.calendar_month_outlined,
+    Icons.calendar_month,
+    'Calendar',
+  ),
+  ('/bookmark', Icons.bookmark_outline, Icons.bookmark, 'Bookmark'),
+  ('/profile', Icons.person_outline, Icons.person, 'Profile'),
+];
+
+class MainLayout extends ConsumerWidget {
   final Widget child;
 
   const MainLayout({super.key, required this.child});
-
-  int _selectedIndex(BuildContext context) {
-    final location = GoRouterState.of(context).matchedLocation;
-
-    return switch (location) {
-      _ when location.startsWith('/calendar') => 1,
-      _ when location.startsWith('/bookmark') => 2,
-      _ when location.startsWith('/profile') => 3,
-      _ => 0,
-    };
-  }
-
-  void _onTap(BuildContext context, int index) {
-    const routes = ['/home', '/calendar', '/bookmark', '/profile'];
-
-    context.go(routes[index]);
-  }
 
   Widget _buildNavItem(IconData icon, String label, {bool isActive = false}) {
     return Column(
@@ -54,15 +51,24 @@ class MainLayout extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Admins manage content, they don't bookmark it.
+    final isAdmin = ref.watch(authProvider).value?.isAdmin ?? false;
+    final tabs = [
+      for (final t in _tabs)
+        if (!(isAdmin && t.$1 == '/bookmark')) t,
+    ];
+    final location = GoRouterState.of(context).matchedLocation;
+    final index = tabs.indexWhere((t) => location.startsWith(t.$1));
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: child,
       bottomNavigationBar: SizedBox(
         height: 95 + MediaQuery.paddingOf(context).bottom,
         child: BottomNavigationBar(
-          currentIndex: _selectedIndex(context),
-          onTap: (index) => _onTap(context, index),
+          currentIndex: index < 0 ? 0 : index,
+          onTap: (i) => context.go(tabs[i].$1),
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
           elevation: 8,
@@ -82,38 +88,12 @@ class MainLayout extends StatelessWidget {
           showSelectedLabels: false,
           showUnselectedLabels: false,
           items: [
-            BottomNavigationBarItem(
-              icon: _buildNavItem(Icons.home_outlined, 'Home'),
-              activeIcon: _buildNavItem(Icons.home, 'Home', isActive: true),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavItem(Icons.calendar_month_outlined, 'Calendar'),
-              activeIcon: _buildNavItem(
-                Icons.calendar_month,
-                'Calendar',
-                isActive: true,
+            for (final (_, icon, activeIcon, label) in tabs)
+              BottomNavigationBarItem(
+                icon: _buildNavItem(icon, label),
+                activeIcon: _buildNavItem(activeIcon, label, isActive: true),
+                label: label,
               ),
-              label: 'Calendar',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavItem(Icons.bookmark_outline, 'Bookmark'),
-              activeIcon: _buildNavItem(
-                Icons.bookmark,
-                'Bookmark',
-                isActive: true,
-              ),
-              label: 'Bookmark',
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavItem(Icons.person_outline, 'Profile'),
-              activeIcon: _buildNavItem(
-                Icons.person,
-                'Profile',
-                isActive: true,
-              ),
-              label: 'Profile',
-            ),
           ],
         ),
       ),

@@ -100,32 +100,35 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       ? 'Nama tidak boleh kosong'
                       : null,
                 ),
-                HuntTextField(
-                  label: 'Universitas',
-                  hintText: 'Contoh: Universitas Brawijaya',
-                  prefixIcon: Icons.account_balance,
-                  controller: _university,
-                ),
-                HuntTextField(
-                  label: 'Jurusan',
-                  hintText: 'Contoh: Sistem Informasi',
-                  prefixIcon: Icons.work_outline,
-                  controller: _major,
-                ),
-                HuntTextField(
-                  label: 'Tahun Lulus',
-                  hintText: 'Contoh: 2027',
-                  prefixIcon: Icons.calendar_today_outlined,
-                  controller: _graduationYear,
-                  keyboardType: TextInputType.number,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return null;
-                    final year = int.tryParse(v.trim());
-                    return year == null || year < 1950 || year > 2100
-                        ? 'Tahun tidak valid'
-                        : null;
-                  },
-                ),
+                // Student details don't apply to admins.
+                if (!(ref.watch(authProvider).value?.isAdmin ?? false)) ...[
+                  HuntTextField(
+                    label: 'Universitas',
+                    hintText: 'Contoh: Universitas Brawijaya',
+                    prefixIcon: Icons.account_balance,
+                    controller: _university,
+                  ),
+                  HuntTextField(
+                    label: 'Jurusan',
+                    hintText: 'Contoh: Sistem Informasi',
+                    prefixIcon: Icons.work_outline,
+                    controller: _major,
+                  ),
+                  HuntTextField(
+                    label: 'Tahun Lulus',
+                    hintText: 'Contoh: 2027',
+                    prefixIcon: Icons.calendar_today_outlined,
+                    controller: _graduationYear,
+                    keyboardType: TextInputType.number,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return null;
+                      final year = int.tryParse(v.trim());
+                      return year == null || year < 1950 || year > 2100
+                          ? 'Tahun tidak valid'
+                          : null;
+                    },
+                  ),
+                ],
                 const SizedBox(height: 12),
                 HuntButton(text: 'Simpan', isLoading: saving, onPressed: _save),
               ],
