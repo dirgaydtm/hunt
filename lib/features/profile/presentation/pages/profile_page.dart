@@ -9,6 +9,13 @@ import '../../../../shared/widgets/hunt_button.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/profile_provider.dart';
 
+TextStyle _ts(double size, FontWeight? weight, Color color) => TextStyle(
+  fontFamily: AppTextStyles.fontFamily,
+  fontSize: size,
+  fontWeight: weight,
+  color: color,
+);
+
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
@@ -16,15 +23,24 @@ class ProfilePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).value;
     if (user == null) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final uploading = ref.watch(profileControllerProvider);
+    final university = user.university ?? 'Universitas belum diisi';
+    final info = [
+      (Icons.mail_outline, user.email),
+      (Icons.account_balance, university),
+      (Icons.work_outline, user.major ?? 'Jurusan belum diisi'),
+      (
+        Icons.calendar_today_outlined,
+        user.graduationYear?.toString() ?? 'Tahun lulus belum diisi',
+      ),
+    ];
 
-    void showError(String? error) {
+    Future<void> changeAvatar() async {
+      final error = await ref
+          .read(profileControllerProvider.notifier)
+          .pickAndUploadAvatar();
       if (error == null || !context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error), backgroundColor: AppColors.redNormal),
@@ -34,22 +50,23 @@ class ProfilePage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
         child: Column(
           children: [
-            ClipPath(
-              clipper: _ProfileHeaderClipper(),
-              child: Container(
-                width: double.infinity,
-                height: 220,
-                color: AppColors.blueNormal,
-                alignment: Alignment(0, -0.2),
-                child: Text(
-                  'Profile',
-                  style: TextStyle(
-                    fontFamily: AppTextStyles.fontFamily,
-                    fontSize: 20,
-                    fontWeight: AppFontWeight.extraBold,
-                    color: AppColors.blueDarkActive,
+            SizedBox(
+              height: 190,
+              child: ClipPath(
+                clipper: _ProfileHeaderClipper(),
+                child: Container(
+                  color: AppColors.blueNormal,
+                  alignment: Alignment(0, -0.2),
+                  child: Text(
+                    'Profile',
+                    style: _ts(
+                      20,
+                      AppFontWeight.extraBold,
+                      AppColors.blueDarkActive,
+                    ),
                   ),
                 ),
               ),
@@ -57,85 +74,56 @@ class ProfilePage extends ConsumerWidget {
             Transform.translate(
               offset: Offset(0, -50),
               child: Column(
+                spacing: 12,
                 children: [
                   _Avatar(
                     imageUrl: user.avatarUrl,
-                    uploading: uploading,
-                    onEdit: () async => showError(
-                      await ref
-                          .read(profileControllerProvider.notifier)
-                          .pickAndUploadAvatar(),
-                    ),
+                    uploading: ref.watch(profileControllerProvider),
+                    onEdit: changeAvatar,
                   ),
-                  SizedBox(height: 12),
                   Text(
                     user.name,
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 18,
-                      fontWeight: AppFontWeight.bold,
-                      color: AppColors.blueDarkActive,
+                    style: _ts(
+                      18,
+                      AppFontWeight.bold,
+                      AppColors.blueDarkActive,
                     ),
                   ),
-                  SizedBox(height: 4),
-                  Text(
-                    user.university ?? 'Universitas belum diisi',
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 14,
-                      color: AppColors.blueDark,
-                    ),
-                  ),
-                  SizedBox(height: 24),
+                  Text(university, style: _ts(14, null, AppColors.blueDark)),
                   Row(
                     mainAxisAlignment: .center,
+                    spacing: 16,
                     children: [
-                      _CircleIconButton(
-                        icon: Icons.notifications,
-                        onTap: () => context.push('/notifications'),
+                      _circleButton(
+                        Icons.notifications,
+                        () => context.push('/notifications'),
                       ),
-                      SizedBox(width: 16),
-                      _CircleIconButton(icon: Icons.bookmark_border),
-                      if (user.isAdmin) ...[
-                        SizedBox(width: 16),
-                        _CircleIconButton(
-                          icon: Icons.admin_panel_settings_outlined,
-                          onTap: () => context.push('/admin'),
+                      if (user.isAdmin)
+                        _circleButton(
+                          Icons.admin_panel_settings_outlined,
+                          () => context.push('/admin'),
                         ),
-                      ],
                     ],
                   ),
-                  SizedBox(height: 32),
-                  HuntAccordion(
-                    title: user.email,
-                    leadingIcon: Icons.mail_outline,
-                    items: [],
+                  Column(
+                    children: [
+                      for (final (icon, title) in info)
+                        HuntAccordion(
+                          title: title,
+                          leadingIcon: icon,
+                          items: [],
+                          horizontalPadding: 16,
+                        ),
+                      Divider(
+                        height: 1,
+                        color: AppColors.blueLightActive.withValues(alpha: 0.5),
+                      ),
+                    ],
                   ),
-                  HuntAccordion(
-                    title: user.university ?? 'Universitas belum diisi',
-                    leadingIcon: Icons.account_balance,
-                    items: [],
-                  ),
-                  HuntAccordion(
-                    title: user.major ?? 'Jurusan belum diisi',
-                    leadingIcon: Icons.work_outline,
-                    items: [],
-                  ),
-                  HuntAccordion(
-                    title:
-                        user.graduationYear?.toString() ??
-                        'Tahun lulus belum diisi',
-                    leadingIcon: Icons.calendar_today_outlined,
-                    items: [],
-                  ),
-                  Divider(
-                    height: 1,
-                    color: AppColors.blueLightActive.withValues(alpha: 0.5),
-                  ),
-                  SizedBox(height: 40),
                   Padding(
-                    padding: .symmetric(horizontal: 46),
+                    padding: .symmetric(horizontal: 32, vertical: 28),
                     child: Row(
+                      spacing: 16,
                       children: [
                         Expanded(
                           child: HuntButton(
@@ -151,7 +139,6 @@ class ProfilePage extends ConsumerWidget {
                             },
                           ),
                         ),
-                        SizedBox(width: 16),
                         Expanded(
                           child: HuntButton(
                             text: 'Edit Profile',
@@ -167,7 +154,6 @@ class ProfilePage extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 40),
                 ],
               ),
             ),
@@ -191,7 +177,6 @@ class _Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      clipBehavior: .none,
       children: [
         Container(
           width: 100,
@@ -215,12 +200,9 @@ class _Avatar extends StatelessWidget {
           right: 0,
           child: GestureDetector(
             onTap: uploading ? null : onEdit,
-            child: Container(
-              padding: .all(6),
-              decoration: BoxDecoration(
-                color: Color(0xFFFBF4D8),
-                shape: .circle,
-              ),
+            child: CircleAvatar(
+              radius: 14,
+              backgroundColor: Color(0xFFFBF4D8),
               child: Icon(
                 Icons.edit,
                 size: 16,
@@ -234,40 +216,31 @@ class _Avatar extends StatelessWidget {
   }
 }
 
-class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({required this.icon, this.onTap});
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      customBorder: CircleBorder(),
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(color: AppColors.blueNormal, shape: .circle),
-        child: Icon(icon, color: Colors.white),
-      ),
-    );
-  }
-}
+Widget _circleButton(IconData icon, VoidCallback onTap) => IconButton.filled(
+  onPressed: onTap,
+  icon: Icon(icon),
+  style: IconButton.styleFrom(
+    backgroundColor: AppColors.blueNormal,
+    fixedSize: Size.square(48),
+  ),
+);
 
 class _ProfileHeaderClipper extends CustomClipper<Path> {
   @override
-  Path getClip(Size size) {
-    return Path()
-      ..lineTo(0, size.height - 60)
-      ..quadraticBezierTo(
-        size.width * .5,
-        size.height + 40,
-        size.width,
-        size.height - 60,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-  }
+  Path getClip(Size size) =>
+      (Path()
+            ..lineTo(440, 0)
+            ..lineTo(440, 253.264)
+            ..cubicTo(440, 253.264, 306.555, 287.133, 218.872, 287)
+            ..cubicTo(132.056, 286.867, 0, 253.264, 0, 253.264)
+            ..close())
+          .transform(
+            Matrix4.diagonal3Values(
+              size.width / 440,
+              size.height / 287,
+              1,
+            ).storage,
+          );
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;

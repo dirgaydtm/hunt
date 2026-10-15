@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../shared/data/opportunity_repository.dart';
 import '../../../../shared/widgets/filter_sheet.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../notifications/presentation/widgets/notification_bell.dart';
 import 'home_search_bar.dart';
 
@@ -19,7 +19,7 @@ class HomeHeader extends ConsumerWidget {
       isScrollControlled: true,
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const FilterSheet(),
+      builder: (context) => FilterSheet(),
     );
     if (filters != null && context.mounted) {
       context.push('/search', extra: filters);
@@ -48,7 +48,7 @@ class HomeHeader extends ConsumerWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const .only(top: 60, left: 32, right: 32, bottom: 28),
+          padding: .only(top: 28, left: 32, right: 32, bottom: 28),
           child: Column(
             children: [
               Row(
@@ -57,6 +57,7 @@ class HomeHeader extends ConsumerWidget {
                 children: [
                   Column(
                     crossAxisAlignment: .start,
+                    spacing: 2,
                     children: [
                       Text(
                         'Halo, $firstName!',
@@ -67,7 +68,6 @@ class HomeHeader extends ConsumerWidget {
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 2),
                       Text(
                         'Selamat berburu peluang!',
                         style: TextStyle(
@@ -78,7 +78,7 @@ class HomeHeader extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  Padding(padding: .all(12), child: const NotificationBell()),
+                  Padding(padding: .all(12), child: NotificationBell()),
                 ],
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
