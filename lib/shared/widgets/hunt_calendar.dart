@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../core/utils/date_time_extension.dart';
+import '../../features/notifications/presentation/widgets/notification_bell.dart';
 
 class HuntCalendar extends StatefulWidget {
   final DateTimeRange? initialDateRange;
@@ -12,13 +13,9 @@ class HuntCalendar extends StatefulWidget {
   final Function(String)? onCategoryChanged;
   final Function(DateTime)? onMonthChanged;
 
-  /// Single-day mode only: the tapped day, or null when it is tapped again.
-  final Function(DateTime?)? onDaySelected;
+  /// Called on every range tap; [end] is null until the second date is picked.
+  final void Function(DateTime? start, DateTime? end)? onRangeChanged;
   final String initialCategory;
-  final RangeSelectionMode selectionMode;
-
-  /// Optional widget at the top-right, e.g. a notification bell.
-  final Widget? headerAction;
 
   const HuntCalendar({
     super.key,
@@ -27,10 +24,8 @@ class HuntCalendar extends StatefulWidget {
     this.events,
     this.onCategoryChanged,
     this.onMonthChanged,
-    this.onDaySelected,
-    this.initialCategory = 'Semua',
-    this.selectionMode = RangeSelectionMode.toggledOn,
-    this.headerAction,
+    this.onRangeChanged,
+    this.initialCategory = 'All',
   });
 
   @override
@@ -44,7 +39,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
 
   static final _gradCircle = BoxDecoration(
     gradient: AppColors.blueGradient,
-    shape: BoxShape.circle,
+    shape: .circle,
   );
 
   TextStyle _ts(double s, FontWeight w, Color c) => TextStyle(
@@ -69,23 +64,14 @@ class _HuntCalendarState extends State<HuntCalendar> {
     widget.onMonthChanged?.call(newMonth);
   }
 
-  void _selectDates(DateTime? s, DateTime? e, DateTime focus) {
-    if (widget.selectionMode == RangeSelectionMode.toggledOff &&
-        s != null &&
-        _start != null &&
-        isSameDay(s, _start)) {
-      s = e = null;
-    }
-    if (widget.selectionMode == RangeSelectionMode.toggledOff) {
-      widget.onDaySelected?.call(s);
-    }
+  void _selectDates(DateTime? start, DateTime? end, DateTime focus) {
     setState(() {
-      _start = s;
-      _end = e;
+      _start = start;
+      _end = end;
       _currentMonth = focus;
     });
+    widget.onRangeChanged?.call(start, end);
 
-    final start = s, end = e;
     if (start != null && end != null && !widget.showCategoryFilter) {
       final nav = Navigator.of(context);
       Future.delayed(Duration(milliseconds: 300), () {
@@ -100,7 +86,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
           return d.year == day.year &&
               d.month == day.month &&
               d.day == day.day &&
-              (_category == 'Semua' || e['category'] == _category);
+              (_category == 'All' || e['category'] == _category);
         }).toList() ??
         [];
   }
@@ -108,34 +94,31 @@ class _HuntCalendarState extends State<HuntCalendar> {
   @override
   Widget build(BuildContext context) {
     final inner = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: .start,
+      mainAxisSize: .min,
       children: [
         _buildHeader(),
-        const SizedBox(height: 24),
+        SizedBox(height: 12),
         _buildCalendar(),
-        const SizedBox(height: 24),
+        SizedBox(height: 16),
         _buildDateRangeDisplay(),
       ],
     );
 
     final content = widget.showCategoryFilter
-        ? Padding(padding: const EdgeInsets.all(24), child: inner)
-        : SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: inner,
-          );
+        ? Padding(padding: .all(24), child: inner)
+        : SingleChildScrollView(padding: .all(24), child: inner);
 
     return widget.showCategoryFilter
         ? Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: .min,
             children: [content, _buildCategoryFilter()],
           )
         : content;
   }
 
   Widget _buildHeader() => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    mainAxisAlignment: .spaceBetween,
     children: [
       Row(
         children: [
@@ -163,14 +146,16 @@ class _HuntCalendarState extends State<HuntCalendar> {
           ),
         ],
       ),
-      if (widget.headerAction != null)
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.blueNormalHover,
-            shape: BoxShape.circle,
-          ),
-          child: widget.headerAction,
+      Container(
+        decoration: BoxDecoration(
+          color: AppColors.blueNormalHover,
+          shape: .circle,
         ),
+        child: NotificationBell(
+          icon: Icons.notifications_rounded,
+          padding: .all(12),
+        ),
+      ),
     ],
   );
 
@@ -179,25 +164,18 @@ class _HuntCalendarState extends State<HuntCalendar> {
     lastDay: DateTime.utc(2100, 12, 31),
     focusedDay: _currentMonth,
     headerVisible: false,
-    daysOfWeekHeight: 40,
-    startingDayOfWeek: StartingDayOfWeek.sunday,
-    availableGestures: AvailableGestures.horizontalSwipe,
+    rowHeight: 44,
+    daysOfWeekHeight: 28,
+    startingDayOfWeek: .sunday,
+    availableGestures: .horizontalSwipe,
     onPageChanged: (d) {
       setState(() => _currentMonth = d);
       widget.onMonthChanged?.call(d);
     },
-    rangeSelectionMode: widget.selectionMode,
+    rangeSelectionMode: .toggledOn,
     rangeStartDay: _start,
     rangeEndDay: _end,
-    selectedDayPredicate: widget.selectionMode == RangeSelectionMode.toggledOff
-        ? (d) => _start != null && isSameDay(d, _start)
-        : null,
-    onDaySelected: widget.selectionMode == RangeSelectionMode.toggledOff
-        ? (s, f) => _selectDates(s, s, f)
-        : null,
-    onRangeSelected: widget.selectionMode == RangeSelectionMode.toggledOn
-        ? _selectDates
-        : null,
+    onRangeSelected: _selectDates,
     eventLoader: _getEvents,
     calendarBuilders: CalendarBuilders(
       markerBuilder: (ctx, day, evs) {
@@ -213,15 +191,12 @@ class _HuntCalendarState extends State<HuntCalendar> {
             AppColors.blueGradient;
         return Positioned.fill(
           child: Container(
-            margin: EdgeInsets.all(6.0),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: gradient,
-            ),
-            alignment: Alignment.center,
+            margin: .all(2),
+            decoration: BoxDecoration(shape: .circle, gradient: gradient),
+            alignment: .center,
             child: Text(
               '${day.day}',
-              style: _ts(16, AppFontWeight.bold, Colors.white),
+              style: _ts(14, AppFontWeight.bold, Colors.white),
             ),
           ),
         );
@@ -229,7 +204,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
       dowBuilder: (ctx, day) => Center(
         child: Text(
           ['S', 'M', 'T', 'W', 'T', 'F', 'S'][day.weekday % 7],
-          style: _ts(16, AppFontWeight.bold, AppColors.orangeNormal),
+          style: _ts(14, AppFontWeight.bold, AppColors.orangeNormal),
         ),
       ),
     ),
@@ -249,54 +224,49 @@ class _HuntCalendarState extends State<HuntCalendar> {
         AppFontWeight.regular,
         AppColors.greyLightDarker,
       ),
-      selectedTextStyle: _ts(16, AppFontWeight.bold, Colors.white),
+      selectedTextStyle: _ts(14, AppFontWeight.bold, Colors.white),
       selectedDecoration: _gradCircle,
       todayDecoration: BoxDecoration(
         color: AppColors.blueNormal.withValues(alpha: 0.3),
-        shape: BoxShape.circle,
+        shape: .circle,
       ),
       rangeStartDecoration: _gradCircle,
       rangeEndDecoration: _gradCircle,
       rangeHighlightColor: AppColors.blueNormal.withValues(alpha: 0.1),
-      withinRangeTextStyle: _ts(16, AppFontWeight.bold, AppColors.blueDark),
+      withinRangeTextStyle: _ts(14, AppFontWeight.bold, AppColors.blueDark),
     ),
   );
 
-  Widget _buildDateRangeDisplay() => Center(
-    child: Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: AppColors.blueLightActive, width: 1.5),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            _start?.toFormattedDate() ?? 'Pilih',
-            style: _ts(14, AppFontWeight.bold, AppColors.blueDarkActive),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text('-', style: TextStyle(color: AppColors.blueDarkActive)),
-          ),
-          Text(
-            _end?.toFormattedDate() ?? 'Tanggal',
-            style: _ts(14, AppFontWeight.bold, AppColors.blueDarkActive),
-          ),
-        ],
-      ),
+  Widget _datePill(DateTime? date, String hint, Color border) => Container(
+    padding: .symmetric(horizontal: 16, vertical: 8),
+    decoration: BoxDecoration(
+      border: .all(color: border, width: 1.5),
+      borderRadius: .circular(20),
     ),
+    child: Text(
+      date?.toFormattedDate() ?? hint,
+      style: _ts(14, AppFontWeight.bold, AppColors.blueDarkActive),
+    ),
+  );
+
+  Widget _buildDateRangeDisplay() => Row(
+    mainAxisAlignment: .center,
+    spacing: 8,
+    children: [
+      _datePill(_start, 'Pilih', AppColors.blueLightActive),
+      Text('-', style: TextStyle(color: AppColors.blueDarkActive)),
+      _datePill(_end, 'Tanggal', AppColors.blueDark),
+    ],
   );
 
   Widget _buildCategoryFilter() => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+    padding: .symmetric(horizontal: 24, vertical: 8),
     color: AppColors.orangeNormal,
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      spacing: 8,
       children: [
         Text(
-          'Filter Kategori: ',
+          'Filter Kategori:',
           style: _ts(16, AppFontWeight.bold, Colors.white),
         ),
         DropdownButton<String>(
@@ -306,7 +276,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
           underline: SizedBox.shrink(),
           style: _ts(16, AppFontWeight.bold, Colors.white),
           items: [
-            'Semua',
+            'All',
             'Beasiswa',
             'Lomba',
             'Magang',

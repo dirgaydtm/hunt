@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -10,7 +8,6 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/models/opportunity_model.dart';
 import '../../../../shared/widgets/hunt_calendar.dart';
 import '../../../../shared/widgets/opportunity_card.dart';
-import '../../../notifications/presentation/widgets/notification_bell.dart';
 import '../providers/calendar_provider.dart';
 
 const _kMonths = [
@@ -37,13 +34,13 @@ class CalendarPage extends ConsumerStatefulWidget {
 
 class _CalendarPageState extends ConsumerState<CalendarPage> {
   DateTime _focusedMonth = DateTime(DateTime.now().year, DateTime.now().month);
-  DateTime? _selectedDay;
+  DateTime? _start, _end;
 
   @override
   Widget build(BuildContext context) {
     final category = ref.watch(calendarCategoryProvider);
     final monthEvents = ref.watch(calendarMonthEventsProvider(_focusedMonth));
-    final all = monthEvents.value ?? const <OpportunityModel>[];
+    final all = monthEvents.value ?? <OpportunityModel>[];
     final markers = all
         .where((e) => e.eventDate != null)
         .map(
@@ -55,43 +52,46 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         )
         .toList();
     final events = all.where((e) {
-      final inCat = category == 'Semua' || e.category == category;
-      final onDay =
-          _selectedDay == null || isSameDay(e.eventDate, _selectedDay);
-      return inCat && onDay;
+      final inCat = category == 'All' || e.category == category;
+      final d = e.eventDate;
+      final inRange =
+          _start == null ||
+          (d != null && !d.isBefore(_start!) && !d.isAfter(_end ?? _start!));
+      return inCat && inRange;
     }).toList();
-    final period = _selectedDay != null
-        ? '${_selectedDay!.day} ${_kMonths[_selectedDay!.month - 1]}'
-        : 'Bulan ${_kMonths[_focusedMonth.month - 1]}';
-    final title = '${category == 'Semua' ? 'Event' : category} $period';
+    String day(DateTime d) => '${d.day} ${_kMonths[d.month - 1]}';
+    final period = _start == null
+        ? 'Bulan ${_kMonths[_focusedMonth.month - 1]}'
+        : _end == null || isSameDay(_start, _end)
+        ? day(_start!)
+        : '${day(_start!)} - ${day(_end!)}';
+    final title = '${category == 'All' ? 'Semua' : category} $period';
 
     return Scaffold(
       backgroundColor: AppColors.blueNormal,
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(30),
+            padding: .all(30),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: .circular(24),
               child: Container(
                 color: Colors.white,
                 child: HuntCalendar(
                   events: markers,
                   showCategoryFilter: true,
-                  headerAction: const NotificationBell(
-                    icon: Icons.notifications_rounded,
-                    padding: EdgeInsets.all(12),
-                  ),
-                  selectionMode: RangeSelectionMode.toggledOff,
                   initialCategory: category,
                   onCategoryChanged: (c) => ref
                       .read(calendarCategoryProvider.notifier)
                       .setCategory(c),
                   onMonthChanged: (m) => setState(() {
                     _focusedMonth = DateTime(m.year, m.month);
-                    _selectedDay = null;
+                    _start = _end = null;
                   }),
-                  onDaySelected: (d) => setState(() => _selectedDay = d),
+                  onRangeChanged: (s, e) => setState(() {
+                    _start = s;
+                    _end = e;
+                  }),
                 ),
               ),
             ),
@@ -100,36 +100,33 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             child: Container(
               color: Colors.white,
               child: monthEvents.hasError
-                  ? const Center(child: Text('Gagal memuat event'))
+                  ? Center(child: Text('Gagal memuat event'))
                   : monthEvents.isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Center(child: CircularProgressIndicator())
                   : events.isEmpty
                   ? Center(
                       child: Text(
-                        _selectedDay != null
+                        _start != null
                             ? 'Tidak ada event di tanggal ini'
                             : 'Tidak ada event di bulan ini',
                       ),
                     )
                   : ListView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
+                      padding: .symmetric(horizontal: 24, vertical: 16),
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: AppTextStyles.fontFamily,
                             fontSize: 16,
                             fontWeight: AppFontWeight.bold,
                             color: AppColors.blueDarkActive,
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         ...events.map(
                           (e) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
+                            padding: .only(bottom: 12),
                             child: OpportunityCard(
                               title: e.title,
                               organizer: e.organizer,

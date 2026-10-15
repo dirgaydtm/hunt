@@ -12,7 +12,7 @@ final calendarMonthEventsProvider =
 
 class CalendarCategoryNotifier extends Notifier<String> {
   @override
-  String build() => 'Semua';
+  String build() => 'All';
   void setCategory(String c) => state = c;
 }
 
