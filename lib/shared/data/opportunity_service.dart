@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' show DateTimeRange;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../constants/locations.dart';
+import '../models/opportunity_model.dart';
 
 typedef JsonRow = Map<String, dynamic>;
 
@@ -40,8 +41,14 @@ class OpportunityService {
     var q = _published;
     final term = query.replaceAll(RegExp(r'[,()%*\\]'), ' ').trim();
     if (term.isNotEmpty) {
+      final lower = term.toLowerCase();
+      final categories = opportunityCategories.keys
+          .where((slug) => slug.contains(lower))
+          .map((slug) => ',category.eq.$slug')
+          .join();
       q = q.or(
-        'title.ilike.%$term%,organizer.ilike.%$term%,location.ilike.%$term%',
+        'title.ilike.%$term%,organizer.ilike.%$term%,location.ilike.%$term%'
+        '$categories',
       );
     }
     if (category != null) q = q.eq('category', category);
@@ -68,8 +75,6 @@ class OpportunityService {
 
   Future<JsonRow?> getById(String id) =>
       _client.from(_table).select().eq('id', id).maybeSingle();
-
-  // ---- admin ----
 
   Future<List<JsonRow>> getAllForAdmin() =>
       _client.from(_table).select().order('created_at', ascending: false);

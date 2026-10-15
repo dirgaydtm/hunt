@@ -1,21 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../shared/widgets/hunt_text_field.dart';
-import '../../../../shared/widgets/opportunity_card.dart';
-import '../../../../shared/models/opportunity_model.dart';
 import '../../../../shared/data/opportunity_providers.dart';
 import '../../../../shared/data/opportunity_repository.dart';
+import '../../../../shared/models/opportunity_model.dart';
 import '../../../../shared/widgets/filter_sheet.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import '../../../../shared/widgets/hunt_text_field.dart';
+import '../../../../shared/widgets/opportunity_card.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   final SearchFilters initialFilters;
@@ -50,7 +47,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
   void _onQueryChanged(String value) {
     setState(() {}); // refresh the clear button
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 350), () {
+    _debounce = Timer(Duration(milliseconds: 350), () {
       setState(() => _filters = _filters.copyWith(query: value.trim()));
     });
   }
@@ -63,7 +60,17 @@ class _SearchPageState extends ConsumerState<SearchPage> {
       backgroundColor: Colors.transparent,
       builder: (context) => FilterSheet(initialFilters: _filters),
     );
-    if (result != null) setState(() => _filters = result);
+    if (result == null) return;
+    setState(() {
+      var query = result.query;
+      if (result.category != 'Semua') {
+        query = result.category;
+      } else if (opportunityCategories.containsValue(query)) {
+        query = '';
+      }
+      _searchController.text = query;
+      _filters = result.copyWith(query: query);
+    });
   }
 
   Widget _buildSearchHeader() {
@@ -75,7 +82,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
           BoxShadow(
             color: AppColors.greyLightDark.withValues(alpha: 0.1),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -148,7 +155,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
         builder: (context) {
           final filteredList = isLoading
               ? OpportunityModel.dummies
-              : (resultsAsync.value ?? const <OpportunityModel>[]);
+              : (resultsAsync.value ?? <OpportunityModel>[]);
 
           if (filteredList.isEmpty && !isLoading) {
             return Center(
@@ -177,7 +184,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
 
           return ListView.builder(
             itemCount: filteredList.length,
-            physics: const BouncingScrollPhysics(),
+            physics: BouncingScrollPhysics(),
             itemBuilder: (context, index) {
               final item = filteredList[index];
               return Padding(

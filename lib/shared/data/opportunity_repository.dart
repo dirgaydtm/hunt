@@ -97,6 +97,7 @@ class SearchFilters {
     if (q.isNotEmpty &&
         !opp.title.toLowerCase().contains(q) &&
         !opp.organizer.toLowerCase().contains(q) &&
+        !opp.category.toLowerCase().contains(q) &&
         !(opp.location?.toLowerCase().contains(q) ?? false)) {
       return false;
     }
