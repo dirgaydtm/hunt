@@ -119,7 +119,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     hintText: 'Contoh: 2027',
                     prefixIcon: Icons.calendar_today_outlined,
                     controller: _graduationYear,
-                    keyboardType: TextInputType.number,
+                    keyboardType: .number,
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return null;
                       final year = int.tryParse(v.trim());

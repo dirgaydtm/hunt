@@ -1,32 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
-import '../../core/utils/date_time_extension.dart';
+import '../models/opportunity_model.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
+import '../utils/date_time_extension.dart';
+import 'category_tag.dart';
 import '../../features/notifications/presentation/widgets/notification_bell.dart';
 
 class HuntCalendar extends StatefulWidget {
   final DateTimeRange? initialDateRange;
-  final bool showCategoryFilter;
-  final List<Map<String, dynamic>>? events;
-  final Function(String)? onCategoryChanged;
-  final Function(DateTime)? onMonthChanged;
+  final List<OpportunityModel> events;
+  final void Function(DateTime month)? onMonthChanged;
 
   /// Called on every range tap; [end] is null until the second date is picked.
   final void Function(DateTime? start, DateTime? end)? onRangeChanged;
-  final String initialCategory;
 
   const HuntCalendar({
     super.key,
     this.initialDateRange,
-    this.showCategoryFilter = false,
-    this.events,
-    this.onCategoryChanged,
+    this.events = const [],
     this.onMonthChanged,
     this.onRangeChanged,
-    this.initialCategory = 'All',
   });
+
+  static Future<DateTimeRange?> pickRange(
+    BuildContext context,
+    DateTimeRange? initial,
+  ) => showDialog<DateTimeRange>(
+    context: context,
+    builder: (context) => Dialog(
+      backgroundColor: Colors.white,
+      clipBehavior: .antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: .circular(24)),
+      child: HuntCalendar(initialDateRange: initial),
+    ),
+  );
 
   @override
   State<HuntCalendar> createState() => _HuntCalendarState();
@@ -35,7 +44,8 @@ class HuntCalendar extends StatefulWidget {
 class _HuntCalendarState extends State<HuntCalendar> {
   late DateTime _currentMonth;
   DateTime? _start, _end;
-  late String _category;
+
+  bool get _isPicker => widget.onRangeChanged == null;
 
   static final _gradCircle = BoxDecoration(
     gradient: AppColors.blueGradient,
@@ -52,17 +62,18 @@ class _HuntCalendarState extends State<HuntCalendar> {
   @override
   void initState() {
     super.initState();
-    _category = widget.initialCategory;
     _start = widget.initialDateRange?.start;
     _end = widget.initialDateRange?.end;
     _currentMonth = _start ?? DateTime.now();
   }
 
-  void _updateMonth(int offset) {
-    final newMonth = DateTime(_currentMonth.year, _currentMonth.month + offset);
-    setState(() => _currentMonth = newMonth);
-    widget.onMonthChanged?.call(newMonth);
+  void _setMonth(DateTime month) {
+    setState(() => _currentMonth = month);
+    widget.onMonthChanged?.call(month);
   }
+
+  void _updateMonth(int offset) =>
+      _setMonth(DateTime(_currentMonth.year, _currentMonth.month + offset));
 
   void _selectDates(DateTime? start, DateTime? end, DateTime focus) {
     setState(() {
@@ -72,7 +83,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
     });
     widget.onRangeChanged?.call(start, end);
 
-    if (start != null && end != null && !widget.showCategoryFilter) {
+    if (start != null && end != null && _isPicker) {
       final nav = Navigator.of(context);
       Future.delayed(Duration(milliseconds: 300), () {
         if (mounted) nav.pop(DateTimeRange(start: start, end: end));
@@ -80,16 +91,8 @@ class _HuntCalendarState extends State<HuntCalendar> {
     }
   }
 
-  List<Map<String, dynamic>> _getEvents(DateTime day) {
-    return widget.events?.where((e) {
-          final d = e['date'] as DateTime;
-          return d.year == day.year &&
-              d.month == day.month &&
-              d.day == day.day &&
-              (_category == 'All' || e['category'] == _category);
-        }).toList() ??
-        [];
-  }
+  List<OpportunityModel> _getEvents(DateTime day) =>
+      widget.events.where((e) => isSameDay(e.eventDate, day)).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -105,16 +108,9 @@ class _HuntCalendarState extends State<HuntCalendar> {
       ],
     );
 
-    final content = widget.showCategoryFilter
-        ? Padding(padding: .all(24), child: inner)
-        : SingleChildScrollView(padding: .all(24), child: inner);
-
-    return widget.showCategoryFilter
-        ? Column(
-            mainAxisSize: .min,
-            children: [content, _buildCategoryFilter()],
-          )
-        : content;
+    return _isPicker
+        ? SingleChildScrollView(padding: .all(24), child: inner)
+        : Padding(padding: .all(24), child: inner);
   }
 
   Widget _buildHeader() => Row(
@@ -159,7 +155,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
     ],
   );
 
-  Widget _buildCalendar() => TableCalendar(
+  Widget _buildCalendar() => TableCalendar<OpportunityModel>(
     firstDay: DateTime.utc(2000, 1, 1),
     lastDay: DateTime.utc(2100, 12, 31),
     focusedDay: _currentMonth,
@@ -168,10 +164,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
     daysOfWeekHeight: 28,
     startingDayOfWeek: .sunday,
     availableGestures: .horizontalSwipe,
-    onPageChanged: (d) {
-      setState(() => _currentMonth = d);
-      widget.onMonthChanged?.call(d);
-    },
+    onPageChanged: _setMonth,
     rangeSelectionMode: .toggledOn,
     rangeStartDay: _start,
     rangeEndDay: _end,
@@ -180,15 +173,7 @@ class _HuntCalendarState extends State<HuntCalendar> {
     calendarBuilders: CalendarBuilders(
       markerBuilder: (ctx, day, evs) {
         if (evs.isEmpty) return SizedBox();
-        final category =
-            (evs.first as Map)['category'] as String? ?? 'Beasiswa';
-        final gradient =
-            {
-              'Beasiswa': AppColors.blueGradient,
-              'Lomba': AppColors.yellowGradient,
-              'Magang': AppColors.greenGradient,
-            }[category] ??
-            AppColors.blueGradient;
+        final gradient = categoryTheme(evs.first.category).gradient;
         return Positioned.fill(
           child: Container(
             margin: .all(2),
@@ -257,37 +242,5 @@ class _HuntCalendarState extends State<HuntCalendar> {
       Text('-', style: TextStyle(color: AppColors.blueDarkActive)),
       _datePill(_end, 'Tanggal', AppColors.blueDark),
     ],
-  );
-
-  Widget _buildCategoryFilter() => Container(
-    padding: .symmetric(horizontal: 24, vertical: 8),
-    color: AppColors.orangeNormal,
-    child: Row(
-      spacing: 8,
-      children: [
-        Text(
-          'Filter Kategori:',
-          style: _ts(16, AppFontWeight.bold, Colors.white),
-        ),
-        DropdownButton<String>(
-          value: _category,
-          dropdownColor: AppColors.orangeNormal,
-          icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-          underline: SizedBox.shrink(),
-          style: _ts(16, AppFontWeight.bold, Colors.white),
-          items: [
-            'All',
-            'Beasiswa',
-            'Lomba',
-            'Magang',
-          ].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-          onChanged: (v) {
-            if (v == null) return;
-            setState(() => _category = v);
-            widget.onCategoryChanged?.call(v);
-          },
-        ),
-      ],
-    ),
   );
 }

@@ -102,7 +102,7 @@ class _BroadcastPageState extends ConsumerState<BroadcastPage> {
                   for (final o in opportunities)
                     DropdownMenuItem(
                       value: o.id,
-                      child: Text(o.title, overflow: TextOverflow.ellipsis),
+                      child: Text(o.title, overflow: .ellipsis),
                     ),
                 ],
                 onChanged: (v) => setState(() => _opportunityId = v),

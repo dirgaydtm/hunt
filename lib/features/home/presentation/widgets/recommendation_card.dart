@@ -1,33 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../../core/widgets/opportunity_image.dart';
+import '../../../../core/models/opportunity_model.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/category_tag.dart';
+import '../../../../core/widgets/opportunity_image.dart';
 
 class RecommendationCard extends StatelessWidget {
-  final String title;
-  final String organizer;
-  final String category;
-  final String? postedAt;
-  final String? imagePath;
-  final VoidCallback? onTap;
+  final OpportunityModel opportunity;
 
-  const RecommendationCard({
-    super.key,
-    required this.title,
-    required this.organizer,
-    required this.category,
-    this.postedAt,
-    this.imagePath,
-    this.onTap,
-  });
+  const RecommendationCard(this.opportunity, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    final catColor = CategoryTheme.getTheme(category).normal;
+    final o = opportunity;
+    final catColor = categoryTheme(o.category).normal;
+    final postedAt = o.postedAt();
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => context.push('/opportunity/${o.id}', extra: o),
       child: Container(
         width: 170,
         margin: .only(right: 9),
@@ -36,11 +27,8 @@ class RecommendationCard extends StatelessWidget {
           child: Stack(
             children: [
               Positioned.fill(
-                child: imagePath != null
-                    ? Image(
-                        image: opportunityImage(imagePath!),
-                        fit: BoxFit.cover,
-                      )
+                child: o.imagePath != null
+                    ? Image(image: opportunityImage(o.imagePath!), fit: .cover)
                     : DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -68,14 +56,16 @@ class RecommendationCard extends StatelessWidget {
               Padding(
                 padding: .all(12),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: .start,
                   children: [
-                    CategoryTag(category: category),
+                    CategoryTag(category: o.category),
                     Spacer(),
                     Text(
-                      postedAt != null ? '$organizer | $postedAt' : organizer,
+                      postedAt != null
+                          ? '${o.organizer} | $postedAt'
+                          : o.organizer,
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      overflow: .ellipsis,
                       style: TextStyle(
                         fontFamily: AppTextStyles.fontFamily,
                         fontSize: 8,
@@ -84,9 +74,9 @@ class RecommendationCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      title,
+                      o.title,
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      overflow: .ellipsis,
                       style: TextStyle(
                         fontFamily: AppTextStyles.fontFamily,
                         fontSize: 12,

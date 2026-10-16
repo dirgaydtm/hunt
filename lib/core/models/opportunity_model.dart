@@ -1,4 +1,4 @@
-import '../../core/utils/date_time_extension.dart';
+import '../utils/date_time_extension.dart';
 
 /// Category slugs as stored in the database, mapped to display labels.
 const opportunityCategories = {
@@ -6,6 +6,8 @@ const opportunityCategories = {
   'lomba': 'Lomba',
   'magang': 'Magang',
 };
+
+final categoryFilters = ['Semua', ...opportunityCategories.values];
 
 class OpportunityModel {
   final String id;

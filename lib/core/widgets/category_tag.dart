@@ -1,41 +1,42 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 
-class CategoryTheme {
-  static ({Color normal, Color light, Color border}) getTheme(String category) {
+typedef CategoryColors = ({
+  Color normal,
+  Color light,
+  Color border,
+  LinearGradient gradient,
+});
+
+CategoryColors categoryTheme(String category) =>
     switch (category.toLowerCase()) {
-      case 'lomba':
-        return (
-          normal: AppColors.yellowDark,
-          light: AppColors.yellowLightHover,
-          border: AppColors.yellowNormal,
-        );
-
-      case 'magang':
-        return (
-          normal: AppColors.greenNormal,
-          light: AppColors.greenLight,
-          border: AppColors.greenLightActive,
-        );
-
-      case 'beasiswa':
-        return (
-          normal: AppColors.blueNormal,
-          light: AppColors.blueLight,
-          border: AppColors.blueLightActive,
-        );
-
-      default:
-        return (
-          normal: AppColors.greyLightDarkActive,
-          light: AppColors.greyDarkLight,
-          border: AppColors.greyDarkLightActive,
-        );
-    }
-  }
-}
+      'lomba' => (
+        normal: AppColors.yellowDark,
+        light: AppColors.yellowLightHover,
+        border: AppColors.yellowNormal,
+        gradient: AppColors.yellowGradient,
+      ),
+      'magang' => (
+        normal: AppColors.greenNormal,
+        light: AppColors.greenLight,
+        border: AppColors.greenLightActive,
+        gradient: AppColors.greenGradient,
+      ),
+      'beasiswa' => (
+        normal: AppColors.blueNormal,
+        light: AppColors.blueLight,
+        border: AppColors.blueLightActive,
+        gradient: AppColors.blueGradient,
+      ),
+      _ => (
+        normal: AppColors.greyLightDarkActive,
+        light: AppColors.greyDarkLight,
+        border: AppColors.greyDarkLightActive,
+        gradient: AppColors.blueGradient,
+      ),
+    };
 
 class CategoryTag extends StatelessWidget {
   final String category;
@@ -44,7 +45,7 @@ class CategoryTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = CategoryTheme.getTheme(category);
+    final theme = categoryTheme(category);
 
     return Container(
       padding: .symmetric(horizontal: 11, vertical: 4),

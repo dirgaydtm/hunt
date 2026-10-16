@@ -45,6 +45,13 @@ class _OpportunityDetailView extends StatelessWidget {
 
   const _OpportunityDetailView({required this.opportunity});
 
+  TextStyle _ts(double size, Color color, [FontWeight? weight]) => TextStyle(
+    fontFamily: AppTextStyles.fontFamily,
+    fontSize: size,
+    fontWeight: weight,
+    color: color,
+  );
+
   Future<void> _toggleBookmark(BuildContext context, WidgetRef ref) async {
     final error = await ref
         .read(bookmarksProvider.notifier)
@@ -108,32 +115,23 @@ class _OpportunityDetailView extends StatelessWidget {
                       if (opportunity.dateRange != null)
                         Text(
                           opportunity.dateRange!,
-                          style: TextStyle(
-                            fontFamily: AppTextStyles.fontFamily,
-                            fontSize: 12,
-                            color: AppColors.greyLightDarkActive,
-                          ),
+                          style: _ts(12, AppColors.greyLightDarkActive),
                         ),
                     ],
                   ),
                   SizedBox(height: 16),
                   Text(
                     opportunity.title,
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 24,
-                      fontWeight: AppFontWeight.extraBold,
-                      color: AppColors.greyDarkNormal,
+                    style: _ts(
+                      24,
+                      AppColors.greyDarkNormal,
+                      AppFontWeight.extraBold,
                     ),
                   ),
                   SizedBox(height: 4),
                   Text(
                     opportunity.organizer,
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 16,
-                      color: AppColors.greyLightDarkActive,
-                    ),
+                    style: _ts(16, AppColors.greyLightDarkActive),
                   ),
                   const SizedBox(height: 28),
                   Divider(
@@ -144,43 +142,33 @@ class _OpportunityDetailView extends StatelessWidget {
                   if (opportunity.description != null) ...[
                     Text(
                       'Deskripsi',
-                      style: TextStyle(
-                        fontFamily: AppTextStyles.fontFamily,
-                        fontSize: 14,
-                        fontWeight: AppFontWeight.bold,
-                        color: AppColors.blueDarkActive,
+                      style: _ts(
+                        14,
+                        AppColors.blueDarkActive,
+                        AppFontWeight.bold,
                       ),
                     ),
                     SizedBox(height: 12),
                     Text(
                       opportunity.description!,
-                      style: TextStyle(
-                        fontFamily: AppTextStyles.fontFamily,
-                        fontSize: 12,
-                        color: AppColors.greyDarkNormal,
-                        height: 1.5,
-                      ),
+                      style: _ts(
+                        12,
+                        AppColors.greyDarkNormal,
+                      ).copyWith(height: 1.5),
                     ),
                     SizedBox(height: 24),
                   ],
-                  if (opportunity.syarat.isNotEmpty)
-                    HuntAccordion(
-                      title: 'Syarat',
-                      leadingIcon: Icons.push_pin,
-                      items: opportunity.syarat,
-                    ),
-                  if (opportunity.berkas.isNotEmpty)
-                    HuntAccordion(
-                      title: 'Berkas',
-                      leadingIcon: Icons.description,
-                      items: opportunity.berkas,
-                    ),
-                  if (opportunity.ketentuan.isNotEmpty)
-                    HuntAccordion(
-                      title: 'Ketentuan',
-                      leadingIcon: Icons.campaign,
-                      items: opportunity.ketentuan,
-                    ),
+                  for (final (title, icon, items) in [
+                    ('Syarat', Icons.push_pin, opportunity.syarat),
+                    ('Berkas', Icons.description, opportunity.berkas),
+                    ('Ketentuan', Icons.campaign, opportunity.ketentuan),
+                  ])
+                    if (items.isNotEmpty)
+                      HuntAccordion(
+                        title: title,
+                        leadingIcon: icon,
+                        items: items,
+                      ),
                   SizedBox(height: 32),
                   HuntButton(
                     text: 'Daftar Sekarang',
@@ -195,90 +183,73 @@ class _OpportunityDetailView extends StatelessWidget {
     );
   }
 
-  LinearGradient _getGradientByCategory(String category) {
-    switch (category.toLowerCase()) {
-      case 'lomba':
-        return AppColors.yellowGradient;
-      case 'magang':
-        return AppColors.greenGradient;
-      case 'beasiswa':
-      default:
-        return AppColors.blueGradient;
-    }
-  }
-
   Widget _buildHeader(BuildContext context) {
     return Container(
       height: 350,
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
+        borderRadius: .vertical(bottom: .circular(40)),
         image: opportunity.imagePath != null
             ? DecorationImage(
                 image: opportunityImage(opportunity.imagePath!),
-                fit: BoxFit.cover,
+                fit: .cover,
               )
             : null,
       ),
       child: Stack(
-        fit: StackFit.expand,
+        fit: .expand,
         children: [
           Opacity(
             opacity: 0.85,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(40),
-                ),
-                gradient: _getGradientByCategory(opportunity.category),
+                borderRadius: .vertical(bottom: .circular(40)),
+                gradient: categoryTheme(opportunity.category).gradient,
               ),
             ),
           ),
           SafeArea(
             bottom: false,
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 16,
-                  left: 24,
-                  right: 24,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildCircleBtn(
-                        icon: Icons.arrow_back,
-                        onTap: () => Navigator.pop(context),
-                      ),
-                      Row(
-                        children: [
-                          Consumer(
-                            builder: (context, ref, _) {
-                              if (ref.watch(authProvider).value?.isAdmin ??
-                                  false) {
-                                return SizedBox.shrink();
-                              }
-                              final saved = ref.watch(
-                                isBookmarkedProvider(opportunity.id),
-                              );
-                              return _buildCircleBtn(
-                                icon: saved
-                                    ? Icons.bookmark
-                                    : Icons.bookmark_border,
-                                onTap: () => _toggleBookmark(context, ref),
-                              );
-                            },
-                          ),
-                          SizedBox(width: 12),
-                          _buildCircleBtn(
-                            icon: Icons.reply,
-                            onTap: () => _share(context),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+            child: Padding(
+              padding: .fromLTRB(24, 16, 24, 0),
+              child: Align(
+                alignment: .topCenter,
+                child: Row(
+                  mainAxisAlignment: .spaceBetween,
+                  children: [
+                    _buildCircleBtn(
+                      icon: Icons.arrow_back,
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    Row(
+                      children: [
+                        Consumer(
+                          builder: (context, ref, _) {
+                            if (ref.watch(authProvider).value?.isAdmin ??
+                                false) {
+                              return SizedBox.shrink();
+                            }
+                            final saved = ref.watch(
+                              isBookmarkedProvider(opportunity.id),
+                            );
+                            return _buildCircleBtn(
+                              icon: saved
+                                  ? Icons.bookmark
+                                  : Icons.bookmark_border,
+                              onTap: () => _toggleBookmark(context, ref),
+                            );
+                          },
+                        ),
+                        SizedBox(width: 12),
+                        _buildCircleBtn(
+                          icon: Icons.reply,
+                          onTap: () => _share(context),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -294,7 +265,7 @@ class _OpportunityDetailView extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: .all(12),
-        decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+        decoration: BoxDecoration(color: Colors.white, shape: .circle),
         child: Icon(icon, color: AppColors.blueNormal, size: 24),
       ),
     );

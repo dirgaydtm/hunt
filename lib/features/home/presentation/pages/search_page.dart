@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -149,61 +148,41 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     }
 
     final isLoading = resultsAsync.isLoading && !resultsAsync.hasValue;
+    final items = isLoading
+        ? OpportunityModel.dummies
+        : resultsAsync.value ?? <OpportunityModel>[];
+    if (items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: .center,
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.search_off_rounded,
+              size: 64,
+              color: AppColors.greyLightDark,
+            ),
+            Text(
+              'Peluang tidak ditemukan',
+              style: TextStyle(
+                fontFamily: AppTextStyles.fontFamily,
+                fontSize: 16,
+                fontWeight: AppFontWeight.bold,
+                color: AppColors.greyLightDarkActive,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return Skeletonizer(
       enabled: isLoading,
-      child: Builder(
-        builder: (context) {
-          final filteredList = isLoading
-              ? OpportunityModel.dummies
-              : (resultsAsync.value ?? <OpportunityModel>[]);
-
-          if (filteredList.isEmpty && !isLoading) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: .center,
-                children: [
-                  Icon(
-                    Icons.search_off_rounded,
-                    size: 64,
-                    color: AppColors.greyLightDark,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Peluang tidak ditemukan',
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 16,
-                      fontWeight: AppFontWeight.bold,
-                      color: AppColors.greyLightDarkActive,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.builder(
-            itemCount: filteredList.length,
-            physics: BouncingScrollPhysics(),
-            itemBuilder: (context, index) {
-              final item = filteredList[index];
-              return Padding(
-                padding: .only(bottom: 16),
-                child: OpportunityCard(
-                  title: item.title,
-                  organizer: item.organizer,
-                  category: item.category,
-                  dateRange: item.dateRange,
-                  imagePath: item.imagePath,
-                  hasBackground: false,
-                  onTap: () {
-                    context.push('/opportunity/${item.id}', extra: item);
-                  },
-                ),
-              );
-            },
-          );
-        },
+      child: ListView.separated(
+        itemCount: items.length,
+        physics: BouncingScrollPhysics(),
+        padding: .only(bottom: 16),
+        separatorBuilder: (_, _) => SizedBox(height: 16),
+        itemBuilder: (_, i) => OpportunityCard(items[i], plain: true),
       ),
     );
   }

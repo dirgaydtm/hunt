@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 
 class HuntDivider extends StatelessWidget {
   final String text;
@@ -16,7 +16,7 @@ class HuntDivider extends StatelessWidget {
           child: Divider(color: AppColors.greyLightNormalActive, thickness: 1),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+          padding: .symmetric(horizontal: 16),
           child: Text(
             text,
             style: TextStyle(

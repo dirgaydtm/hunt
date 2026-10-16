@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/utils/date_time_extension.dart';
-import '../../../../core/widgets/hunt_calendar.dart';
 import '../constants/locations.dart';
+import '../models/opportunity_model.dart';
 import '../data/opportunity_repository.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
+import '../utils/date_time_extension.dart';
+import 'hunt_button.dart';
+import 'hunt_calendar.dart';
 import 'location_sheet.dart';
-import '../../../../core/widgets/hunt_button.dart';
 
 /// Pops a [SearchFilters] (keeping the initial query) when applied.
 class FilterSheet extends StatefulWidget {
@@ -20,324 +21,211 @@ class FilterSheet extends StatefulWidget {
 }
 
 class _FilterSheetState extends State<FilterSheet> {
-  String _selectedCategory = 'Semua';
-  List<String> _selectedLocations = [];
-  DateTimeRange? _selectedDateRange;
+  late var _f = widget.initialFilters ?? const SearchFilters();
 
-  @override
-  void initState() {
-    super.initState();
-    final initial = widget.initialFilters;
-    if (initial != null) {
-      _selectedCategory = initial.category;
-      _selectedLocations = List.of(initial.locations);
-      _selectedDateRange = initial.dateRange;
-    }
-  }
+  TextStyle _ts(double size, Color color, [FontWeight? weight]) => TextStyle(
+    fontFamily: AppTextStyles.fontFamily,
+    fontSize: size,
+    fontWeight: weight,
+    color: color,
+  );
 
-  void _showLocationSelector() async {
+  void _set(SearchFilters f) => setState(() => _f = f);
+
+  void _setLocations(List<String> locations) =>
+      _set(_f.copyWith(locations: locations));
+
+  void _toggleLocation(String location) => _setLocations(
+    _f.locations.contains(location)
+        ? _f.locations.where((l) => l != location).toList()
+        : [..._f.locations, location],
+  );
+
+  Future<void> _pickLocations() async {
     final result = await showModalBottomSheet<List<String>>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) =>
-          LocationSheet(initialSelectedLocations: _selectedLocations),
+          LocationSheet(initialSelectedLocations: _f.locations),
     );
-
-    if (result != null) {
-      setState(() {
-        _selectedLocations = result;
-      });
-    }
+    if (result != null) _setLocations(result);
   }
 
-  void _togglePopularLocation(String location) {
-    setState(() {
-      if (_selectedLocations.contains(location)) {
-        _selectedLocations.remove(location);
-      } else {
-        _selectedLocations.add(location);
-      }
-    });
+  Future<void> _pickDate() async {
+    final result = await HuntCalendar.pickRange(context, _f.dateRange);
+    if (result != null) _set(_f.copyWith(dateRange: () => result));
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final result = await showDialog<DateTimeRange>(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(24)),
-          child: HuntCalendar(initialDateRange: _selectedDateRange),
-        ),
-      ),
-    );
-
-    if (result != null) {
-      setState(() {
-        _selectedDateRange = result;
-      });
-    }
-  }
-
-  Widget _buildFilterChip({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
+  Widget _chip(
+    String label,
+    bool selected,
+    VoidCallback onTap, {
     double fontSize = 12,
     double horizontalPadding = 8,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: horizontalPadding,
-          vertical: 10,
+  }) => GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: .symmetric(horizontal: horizontalPadding, vertical: 10),
+      decoration: BoxDecoration(
+        color: selected ? AppColors.blueDark : Colors.white,
+        border: .all(
+          color: selected ? AppColors.blueDark : AppColors.blueLightActive,
         ),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.blueDark : Colors.white,
-          border: Border.all(
-            color: isSelected ? AppColors.blueDark : AppColors.blueLightActive,
-          ),
-          borderRadius: BorderRadius.circular(48),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontFamily: AppTextStyles.fontFamily,
-            fontSize: fontSize,
-            fontWeight: isSelected
-                ? AppFontWeight.semiBold
-                : AppFontWeight.regular,
-            color: isSelected ? Colors.white : AppColors.blueDark,
-          ),
+        borderRadius: .circular(48),
+      ),
+      child: Text(
+        label,
+        style: _ts(
+          fontSize,
+          selected ? Colors.white : AppColors.blueDark,
+          selected ? AppFontWeight.semiBold : AppFontWeight.regular,
         ),
       ),
-    );
-  }
+    ),
+  );
+
+  Widget _title(String text) =>
+      Text(text, style: _ts(14, AppColors.blueDarker, AppFontWeight.bold));
 
   @override
   Widget build(BuildContext context) {
+    final range = _f.dateRange;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(28),
-          topRight: Radius.circular(28),
-        ),
+        borderRadius: .vertical(top: .circular(28)),
       ),
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      padding: .only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 44),
+          padding: .fromLTRB(44, 12, 44, 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: .start,
             children: [
-              SizedBox(height: 12),
-
               Center(
                 child: Container(
                   width: 50,
                   height: 5,
                   decoration: BoxDecoration(
                     color: AppColors.greyLightDark,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: .circular(10),
                   ),
                 ),
               ),
               SizedBox(height: 12),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: .spaceBetween,
                 children: [
                   SizedBox(width: 64),
                   Text(
                     'Filter',
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 20,
-                      fontWeight: AppFontWeight.bold,
-                      color: AppColors.blueDarkActive,
+                    style: _ts(
+                      20,
+                      AppColors.blueDarkActive,
+                      AppFontWeight.bold,
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedCategory = 'Semua';
-                        _selectedLocations.clear();
-                        _selectedDateRange = null;
-                      });
-                    },
+                    onPressed: () => _set(SearchFilters(query: _f.query)),
                     child: Text(
                       'Reset',
-                      style: TextStyle(
-                        fontFamily: AppTextStyles.fontFamily,
-                        fontSize: 14,
-                        color: AppColors.greyLightDarkActive,
-                      ),
+                      style: _ts(14, AppColors.greyLightDarkActive),
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 24),
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              _title('Kategori'),
+              SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  Text(
-                    'Kategori',
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 14,
-                      fontWeight: AppFontWeight.bold,
-                      color: AppColors.blueDarker,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: ['Semua', 'Beasiswa', 'Lomba', 'Magang'].map((
+                  for (final cat in categoryFilters)
+                    _chip(
                       cat,
-                    ) {
-                      return _buildFilterChip(
-                        label: cat,
-                        isSelected: _selectedCategory == cat,
-                        onTap: () => setState(() => _selectedCategory = cat),
-                      );
-                    }).toList(),
-                  ),
+                      _f.category == cat,
+                      () => _set(_f.copyWith(category: cat)),
+                    ),
                 ],
               ),
               SizedBox(height: 24),
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
+                mainAxisAlignment: .spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  _title('Lokasi'),
+                  GestureDetector(
+                    onTap: _pickLocations,
+                    child: Row(
+                      spacing: 4,
+                      children: [
+                        Text(
+                          _f.locations.isEmpty
+                              ? 'Semua'
+                              : '${_f.locations.length} Terpilih',
+                          style: _ts(14, AppColors.greyLightDarkActive),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 12,
+                          color: AppColors.greyLightDarkActive,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final loc in Locations.popular)
+                    _chip(
+                      loc,
+                      _f.locations.contains(loc),
+                      () => _toggleLocation(loc),
+                      fontSize: 11,
+                      horizontalPadding: 14,
+                    ),
+                ],
+              ),
+              SizedBox(height: 24),
+              _title('Batas Waktu'),
+              SizedBox(height: 12),
+              GestureDetector(
+                onTap: _pickDate,
+                child: Container(
+                  padding: .symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    border: .all(color: AppColors.blueLightActive),
+                    borderRadius: .circular(30),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: .spaceBetween,
                     children: [
                       Text(
-                        'Lokasi',
-                        style: TextStyle(
-                          fontFamily: AppTextStyles.fontFamily,
-                          fontSize: 14,
-                          fontWeight: AppFontWeight.bold,
-                          color: AppColors.blueDarker,
-                        ),
+                        range == null
+                            ? 'Pilih Tanggal'
+                            : range.start == range.end
+                            ? range.start.toFormattedDate()
+                            : '${range.start.toFormattedDate()} - ${range.end.toFormattedDate()}',
+                        style: _ts(14, AppColors.greyDarkNormal),
                       ),
-                      GestureDetector(
-                        onTap: _showLocationSelector,
-                        child: Row(
-                          children: [
-                            Text(
-                              _selectedLocations.isEmpty
-                                  ? 'Semua'
-                                  : '${_selectedLocations.length} Terpilih',
-                              style: TextStyle(
-                                fontFamily: AppTextStyles.fontFamily,
-                                fontSize: 14,
-                                color: AppColors.greyLightDarkActive,
-                              ),
-                            ),
-                            SizedBox(width: 4),
-                            Icon(
-                              Icons.arrow_forward_ios,
-                              size: 12,
-                              color: AppColors.greyLightDarkActive,
-                            ),
-                          ],
-                        ),
+                      Icon(
+                        Icons.calendar_month_outlined,
+                        color: AppColors.blueLightActive,
                       ),
                     ],
                   ),
-                  SizedBox(height: 12),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: Locations.popular.map((loc) {
-                      return _buildFilterChip(
-                        label: loc,
-                        isSelected: _selectedLocations.contains(loc),
-                        onTap: () => _togglePopularLocation(loc),
-                        fontSize: 11,
-                        horizontalPadding: 14,
-                      );
-                    }).toList(),
-                  ),
-                ],
+                ),
               ),
               SizedBox(height: 24),
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Batas Waktu',
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 14,
-                      fontWeight: AppFontWeight.bold,
-                      color: AppColors.blueDarker,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: () => _selectDate(context),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: AppColors.blueLightActive),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            _selectedDateRange != null
-                                ? (_selectedDateRange!.start ==
-                                          _selectedDateRange!.end
-                                      ? _selectedDateRange!.start
-                                            .toFormattedDate()
-                                      : '${_selectedDateRange!.start.toFormattedDate()} - ${_selectedDateRange!.end.toFormattedDate()}')
-                                : 'Pilih Tanggal',
-                            style: TextStyle(
-                              fontFamily: AppTextStyles.fontFamily,
-                              fontSize: 14,
-                              color: AppColors.greyDarkNormal,
-                            ),
-                          ),
-                          Icon(
-                            Icons.calendar_month_outlined,
-                            color: AppColors.blueLightActive,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 24),
-
               HuntButton(
                 text: 'Terapkan',
-                onPressed: () {
-                  Navigator.pop(
-                    context,
-                    (widget.initialFilters ?? const SearchFilters()).copyWith(
-                      category: _selectedCategory,
-                      locations: List.of(_selectedLocations),
-                      dateRange: () => _selectedDateRange,
-                    ),
-                  );
-                },
+                onPressed: () => Navigator.pop(context, _f),
               ),
-
-              SizedBox(height: 16),
             ],
           ),
         ),

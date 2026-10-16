@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/models/opportunity_model.dart';
+import '../../../../core/data/opportunity_repository.dart';
 import '../../../../core/widgets/category_tag.dart';
 import '../providers/admin_provider.dart';
 
@@ -16,14 +16,7 @@ class AdminPage extends ConsumerStatefulWidget {
 }
 
 class _AdminPageState extends ConsumerState<AdminPage> {
-  String _query = '';
-
-  bool _matches(OpportunityModel o) {
-    final q = _query.toLowerCase();
-    return q.isEmpty ||
-        o.title.toLowerCase().contains(q) ||
-        o.organizer.toLowerCase().contains(q);
-  }
+  var _filters = const SearchFilters();
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +63,8 @@ class _AdminPageState extends ConsumerState<AdminPage> {
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
-              onChanged: (v) => setState(() => _query = v.trim()),
+              onChanged: (v) =>
+                  setState(() => _filters = SearchFilters(query: v.trim())),
             ),
           ),
           Expanded(
@@ -79,7 +73,7 @@ class _AdminPageState extends ConsumerState<AdminPage> {
               error: (e, _) =>
                   const Center(child: Text('Gagal memuat peluang')),
               data: (all) {
-                final items = all.where(_matches).toList();
+                final items = all.where(_filters.matches).toList();
                 if (items.isEmpty) {
                   return const Center(child: Text('Belum ada peluang'));
                 }
@@ -112,7 +106,7 @@ class _AdminPageState extends ConsumerState<AdminPage> {
                             if (!o.isPublished)
                               const Chip(
                                 label: Text('Draft'),
-                                visualDensity: VisualDensity.compact,
+                                visualDensity: .compact,
                               ),
                           ],
                         ),

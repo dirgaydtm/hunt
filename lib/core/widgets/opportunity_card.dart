@@ -1,164 +1,131 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../models/opportunity_model.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 import 'category_tag.dart';
 import 'opportunity_image.dart';
 
 class OpportunityCard extends StatelessWidget {
-  final String title;
-  final String organizer;
-  final String category;
-  final String? dateRange;
-  final String? urgencyText;
+  final OpportunityModel opportunity;
+  final bool plain;
 
-  final Widget? logo;
-  final String? imagePath;
-  final VoidCallback? onTap;
-  final bool hasBackground;
+  const OpportunityCard(this.opportunity, {super.key, this.plain = false});
 
-  const OpportunityCard({
-    super.key,
-    required this.title,
-    required this.organizer,
-    required this.category,
-    this.dateRange,
-    this.urgencyText,
-    this.logo,
-    this.imagePath,
-    this.onTap,
-    this.hasBackground = true,
-  });
-
-  Widget _buildFallbackLogo() {
-    final theme = CategoryTheme.getTheme(category);
-
-    final icon = switch (category.toLowerCase()) {
-      'beasiswa' => Icons.school,
-      'lomba' => Icons.emoji_events,
-      _ => Icons.business,
-    };
-
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(color: theme.light, shape: .circle),
-      child: Icon(icon, size: 24, color: theme.normal),
-    );
-  }
+  TextStyle _ts(double size, Color color, [FontWeight? weight]) => TextStyle(
+    fontFamily: AppTextStyles.fontFamily,
+    fontSize: size,
+    fontWeight: weight,
+    color: color,
+  );
 
   @override
   Widget build(BuildContext context) {
-    final theme = CategoryTheme.getTheme(category);
-
-    final finalLogo =
-        logo ??
-        (imagePath != null
-            ? Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  borderRadius: .circular(10),
-                  border: .all(color: AppColors.greyLightNormal),
-                ),
-                child: ClipRRect(
-                  borderRadius: .circular(9),
-                  child: Image(
-                    image: opportunityImage(imagePath!),
-                    fit: .cover,
-                  ),
-                ),
-              )
-            : _buildFallbackLogo());
+    final o = opportunity;
+    final theme = categoryTheme(o.category);
+    final urgency = plain ? null : o.urgencyText();
+    final date = plain ? o.dateRange : null;
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () => context.push('/opportunity/${o.id}', extra: o),
       child: Container(
         padding: .symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: hasBackground ? theme.light : Colors.transparent,
+          color: plain ? Colors.transparent : theme.light,
           borderRadius: .circular(24),
           border: .all(color: theme.border),
-          boxShadow: hasBackground
-              ? [
+          boxShadow: plain
+              ? null
+              : [
                   BoxShadow(
                     color: theme.normal.withValues(alpha: 0.15),
                     blurRadius: 8,
-                    offset: Offset(0, 0),
-                    spreadRadius: 0,
                   ),
-                ]
-              : null,
+                ],
         ),
         child: Row(
-          crossAxisAlignment: .center,
+          spacing: 24,
           children: [
-            finalLogo,
-            SizedBox(width: 24),
+            o.imagePath == null
+                ? Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: theme.light,
+                      shape: .circle,
+                    ),
+                    child: Icon(switch (o.category.toLowerCase()) {
+                      'beasiswa' => Icons.school,
+                      'lomba' => Icons.emoji_events,
+                      _ => Icons.business,
+                    }, color: theme.normal),
+                  )
+                : Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      borderRadius: .circular(10),
+                      border: .all(color: AppColors.greyLightNormal),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: .circular(9),
+                      child: Image(
+                        image: opportunityImage(o.imagePath!),
+                        fit: .cover,
+                      ),
+                    ),
+                  ),
             Expanded(
               child: Column(
                 crossAxisAlignment: .start,
                 children: [
                   Row(
-                    mainAxisAlignment: .spaceBetween,
+                    spacing: 8,
                     children: [
-                      Row(
-                        children: [
-                          CategoryTag(category: category),
-                          if (urgencyText != null)
-                            Container(
-                              margin: .only(left: 8),
-                              padding: .symmetric(horizontal: 10, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: AppColors.orangeLight,
-                                border: .all(color: AppColors.orangeNormal),
-                                borderRadius: .circular(48),
-                              ),
-                              child: Text(
-                                urgencyText!,
-                                style: TextStyle(
-                                  fontFamily: AppTextStyles.fontFamily,
-                                  fontSize: 8,
-                                  fontWeight: AppFontWeight.semiBold,
-                                  color: AppColors.orangeNormal,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      if (dateRange != null)
-                        Text(
-                          dateRange!,
-                          style: TextStyle(
-                            fontFamily: AppTextStyles.fontFamily,
-                            fontSize: 10,
-                            color: AppColors.greyLightDarkActive,
+                      CategoryTag(category: o.category),
+                      if (urgency != null)
+                        Container(
+                          padding: .symmetric(horizontal: 10, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.orangeLight,
+                            border: .all(color: AppColors.orangeNormal),
+                            borderRadius: .circular(48),
                           ),
+                          child: Text(
+                            urgency,
+                            style: _ts(
+                              8,
+                              AppColors.orangeNormal,
+                              AppFontWeight.semiBold,
+                            ),
+                          ),
+                        ),
+                      Spacer(),
+                      if (date != null)
+                        Text(
+                          date,
+                          style: _ts(10, AppColors.greyLightDarkActive),
                         ),
                     ],
                   ),
                   SizedBox(height: 8),
                   Text(
-                    title,
+                    o.title,
                     maxLines: 1,
                     overflow: .ellipsis,
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 12,
-                      fontWeight: AppFontWeight.bold,
-                      color: AppColors.greyDarkNormal,
+                    style: _ts(
+                      12,
+                      AppColors.greyDarkNormal,
+                      AppFontWeight.bold,
                     ),
                   ),
                   SizedBox(height: 4),
                   Text(
-                    organizer,
+                    o.organizer,
                     maxLines: 1,
                     overflow: .ellipsis,
-                    style: TextStyle(
-                      fontFamily: AppTextStyles.fontFamily,
-                      fontSize: 10,
-                      color: AppColors.greyLightDarkActive,
-                    ),
+                    style: _ts(10, AppColors.greyLightDarkActive),
                   ),
                 ],
               ),

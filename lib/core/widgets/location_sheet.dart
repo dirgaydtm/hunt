@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/widgets/hunt_button.dart';
-import '../../../../core/widgets/hunt_text_field.dart';
 import '../constants/locations.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
+import 'hunt_button.dart';
+import 'hunt_text_field.dart';
 
 class LocationSheet extends StatefulWidget {
   final List<String> initialSelectedLocations;
@@ -16,22 +16,9 @@ class LocationSheet extends StatefulWidget {
 }
 
 class _LocationSheetState extends State<LocationSheet> {
-  late final List<String> _selectedLocations;
-
-  final _searchController = TextEditingController();
-
-  String _searchQuery = '';
-
-  @override
-  void initState() {
-    super.initState();
-
-    _selectedLocations = List.from(widget.initialSelectedLocations);
-
-    _searchController.addListener(() {
-      setState(() => _searchQuery = _searchController.text);
-    });
-  }
+  late final _selectedLocations = List.of(widget.initialSelectedLocations);
+  late final _searchController = TextEditingController()
+    ..addListener(() => setState(() {}));
 
   @override
   void dispose() {
@@ -58,7 +45,7 @@ class _LocationSheetState extends State<LocationSheet> {
         borderRadius: .circular(48),
         onTap: () => _toggleLocation(location),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10),
+          padding: .symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.blueDark : Colors.white,
             borderRadius: .circular(16),
@@ -89,19 +76,17 @@ class _LocationSheetState extends State<LocationSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final query = _searchController.text.toLowerCase();
     final filteredLocations = Locations.all
-        .where(
-          (location) =>
-              location.toLowerCase().contains(_searchQuery.toLowerCase()),
-        )
+        .where((location) => location.toLowerCase().contains(query))
         .toList();
 
     return Container(
       height: MediaQuery.sizeOf(context).height * .85,
-      padding: EdgeInsets.symmetric(horizontal: 24),
+      padding: .symmetric(horizontal: 24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: .vertical(top: Radius.circular(28)),
+        borderRadius: .vertical(top: .circular(28)),
       ),
       child: Column(
         children: [
@@ -119,7 +104,7 @@ class _LocationSheetState extends State<LocationSheet> {
           SizedBox(height: 12),
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: .spaceBetween,
             children: [
               IconButton(
                 onPressed: () => Navigator.pop(context),
@@ -151,12 +136,12 @@ class _LocationSheetState extends State<LocationSheet> {
           SizedBox(height: 16),
 
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: .symmetric(horizontal: 20),
             child: HuntTextField(
               controller: _searchController,
               hintText: 'Cari lokasi...',
               prefixIcon: Icons.search,
-              suffixIcon: _searchQuery.isEmpty
+              suffixIcon: query.isEmpty
                   ? null
                   : IconButton(
                       onPressed: _searchController.clear,

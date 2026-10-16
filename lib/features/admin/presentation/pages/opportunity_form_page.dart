@@ -112,20 +112,11 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
   }
 
   Future<void> _pickRegistrationRange() async {
-    final result = await showDialog<DateTimeRange>(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: HuntCalendar(
-            initialDateRange: _start != null && _end != null
-                ? DateTimeRange(start: _start!, end: _end!)
-                : null,
-          ),
-        ),
-      ),
+    final result = await HuntCalendar.pickRange(
+      context,
+      _start != null && _end != null
+          ? DateTimeRange(start: _start!, end: _end!)
+          : null,
     );
     if (result != null) {
       setState(() {
@@ -228,17 +219,17 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
         : null;
     return InkWell(
       onTap: _pickImage,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: .circular(16),
       child: Container(
         height: 160,
         decoration: BoxDecoration(
           color: AppColors.blueLightHover,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: .circular(16),
           image: image == null
               ? null
-              : DecorationImage(image: image, fit: BoxFit.cover),
+              : DecorationImage(image: image, fit: .cover),
         ),
-        alignment: Alignment.center,
+        alignment: .center,
         child: image == null
             ? const Column(
                 mainAxisSize: .min,
@@ -346,14 +337,14 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
               const SizedBox(height: 16),
               _sectionTitle('Tanggal'),
               ListTile(
-                contentPadding: EdgeInsets.zero,
+                contentPadding: .zero,
                 leading: const Icon(Icons.date_range_outlined),
                 title: const Text('Periode pendaftaran'),
                 subtitle: Text('${_fmt(_start)} - ${_fmt(_end)}'),
                 onTap: _pickRegistrationRange,
               ),
               ListTile(
-                contentPadding: EdgeInsets.zero,
+                contentPadding: .zero,
                 leading: const Icon(Icons.event_outlined),
                 title: const Text('Tanggal acara (kalender)'),
                 subtitle: Text(_fmt(_event)),
@@ -371,7 +362,7 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
                 hintText: 'https://...',
                 prefixIcon: Icons.link,
                 controller: _url,
-                keyboardType: TextInputType.url,
+                keyboardType: .url,
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
                   final uri = Uri.tryParse(v.trim());
@@ -400,14 +391,14 @@ class _OpportunityFormState extends ConsumerState<_OpportunityForm> {
               ),
               const SizedBox(height: 16),
               SwitchListTile(
-                contentPadding: EdgeInsets.zero,
+                contentPadding: .zero,
                 title: const Text('Publikasikan'),
                 subtitle: const Text('Matikan untuk menyimpan sebagai draft'),
                 value: _published,
                 onChanged: (v) => setState(() => _published = v),
               ),
               SwitchListTile(
-                contentPadding: EdgeInsets.zero,
+                contentPadding: .zero,
                 title: const Text('Tampilkan di Rekomendasi'),
                 value: _recommended,
                 onChanged: (v) => setState(() => _recommended = v),
