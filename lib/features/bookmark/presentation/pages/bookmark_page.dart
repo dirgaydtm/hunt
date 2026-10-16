@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -41,17 +40,7 @@ class BookmarkPage extends ConsumerWidget {
                     final item = bookmarks[index];
                     return Padding(
                       padding: .only(bottom: 16),
-                      child: OpportunityCard(
-                        title: item.title,
-                        organizer: item.organizer,
-                        category: item.category,
-                        urgencyText: item.urgencyText(),
-                        imagePath: item.imagePath,
-                        hasBackground: true,
-                        onTap: () {
-                          context.push('/opportunity/${item.id}', extra: item);
-                        },
-                      ),
+                      child: OpportunityCard(item),
                     );
                   },
                 );

@@ -1,34 +1,66 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/user_model.dart';
-import '../services/auth_service.dart';
+
+/// Deep link the Supabase dashboard must allow as a redirect URL.
+const authRedirectUrl = 'io.supabase.hunt://login-callback';
 
 class AuthRepository {
-  final AuthService _authService;
+  final SupabaseClient _client;
 
-  const AuthRepository(this._authService);
+  const AuthRepository(this._client);
 
-  Session? get currentSession => _authService.currentSession;
+  String? get _redirect => kIsWeb ? null : authRedirectUrl;
 
-  Stream<AuthState> get authStateChanges => _authService.authStateChanges;
+  Session? get currentSession => _client.auth.currentSession;
+
+  Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 
   Future<void> login(String email, String password) {
-    return _authService.login(email, password);
+    return _client.auth.signInWithPassword(email: email, password: password);
   }
 
-  Future<void> loginWithGoogle() => _authService.loginWithGoogle();
+  /// Opens the Google consent screen. The session arrives later through
+  /// [authStateChanges] once the deep link brings the user back.
+  Future<void> loginWithGoogle() {
+    return _client.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: _redirect,
+    );
+  }
 
+  /// Returns true when the user is signed in immediately, false when
+  /// email confirmation is required first.
   Future<bool> register({
     required String name,
     required String email,
     required String password,
-  }) {
-    return _authService.register(name: name, email: email, password: password);
+  }) async {
+    final res = await _client.auth.signUp(
+      email: email,
+      password: password,
+      data: {'name': name},
+      emailRedirectTo: _redirect,
+    );
+    return res.session != null;
   }
 
-  Future<void> logout() => _authService.logout();
+  Future<void> logout() => _client.auth.signOut();
 
-  Future<UserModel?> fetchProfile(String userId) {
-    return _authService.fetchProfile(userId);
+  Future<UserModel?> fetchProfile(String userId) async {
+    final row = await _client
+        .from('profiles')
+        .select()
+        .eq('id', userId)
+        .maybeSingle();
+    if (row == null) return null;
+    final avatarPath = row['avatar_path'] as String?;
+    return UserModel.fromJson(
+      row,
+      avatarUrl: avatarPath == null
+          ? null
+          : _client.storage.from('avatars').getPublicUrl(avatarPath),
+    );
   }
 }

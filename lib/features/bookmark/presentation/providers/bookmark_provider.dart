@@ -7,18 +7,13 @@ import '../../../../core/data/opportunity_providers.dart';
 import '../../../../core/data/opportunity_repository.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/repositories/bookmark_repository.dart';
-import '../../data/services/bookmark_service.dart';
 
-final bookmarkServiceProvider = Provider(
-  (ref) => BookmarkService(ref.watch(supabaseClientProvider)),
+final bookmarkRepositoryProvider = Provider(
+  (ref) => BookmarkRepository(
+    ref.watch(supabaseClientProvider),
+    ref.watch(opportunityRepositoryProvider),
+  ),
 );
-
-final bookmarkRepositoryProvider = Provider((ref) {
-  return BookmarkRepository(
-    ref.watch(bookmarkServiceProvider),
-    ref.watch(opportunityServiceProvider),
-  );
-});
 
 /// The signed-in user's bookmarks, with optimistic add/remove.
 class BookmarksNotifier extends AsyncNotifier<List<OpportunityModel>> {
@@ -60,35 +55,6 @@ final isBookmarkedProvider = Provider.family<bool, String>(
       ref.watch(bookmarksProvider).value?.any((o) => o.id == id) ?? false,
 );
 
-class BookmarkCategoryNotifier extends Notifier<String> {
-  @override
-  String build() => 'Semua';
-
-  void setCategory(String category) {
-    state = category;
-  }
-}
-
-final bookmarkCategoryProvider =
-    NotifierProvider<BookmarkCategoryNotifier, String>(
-      BookmarkCategoryNotifier.new,
-    );
-
-class BookmarkSearchQueryNotifier extends Notifier<String> {
-  @override
-  String build() => '';
-
-  void setQuery(String query) {
-    state = query;
-  }
-}
-
-final bookmarkSearchQueryProvider =
-    NotifierProvider<BookmarkSearchQueryNotifier, String>(
-      BookmarkSearchQueryNotifier.new,
-    );
-
-/// Extra filters from the filter sheet (locations, date range).
 class BookmarkFiltersNotifier extends Notifier<SearchFilters> {
   @override
   SearchFilters build() => const SearchFilters();
@@ -104,35 +70,8 @@ final bookmarkFiltersProvider =
 final filteredBookmarksProvider = Provider<AsyncValue<List<OpportunityModel>>>((
   ref,
 ) {
-  final bookmarksAsync = ref.watch(bookmarksProvider);
   final filters = ref.watch(bookmarkFiltersProvider);
-  final selectedCategory = ref.watch(bookmarkCategoryProvider);
-  final searchQuery = ref.watch(bookmarkSearchQueryProvider).toLowerCase();
-
-  return bookmarksAsync.whenData((bookmarks) {
-    var filtered = bookmarks;
-
-    filtered = filtered.where(filters.matches).toList();
-
-    if (selectedCategory != 'Semua') {
-      filtered = filtered
-          .where(
-            (item) =>
-                item.category.toLowerCase() == selectedCategory.toLowerCase(),
-          )
-          .toList();
-    }
-
-    if (searchQuery.isNotEmpty) {
-      filtered = filtered
-          .where(
-            (item) =>
-                item.title.toLowerCase().contains(searchQuery) ||
-                item.organizer.toLowerCase().contains(searchQuery),
-          )
-          .toList();
-    }
-
-    return filtered;
-  });
+  return ref
+      .watch(bookmarksProvider)
+      .whenData((bookmarks) => bookmarks.where(filters.matches).toList());
 });

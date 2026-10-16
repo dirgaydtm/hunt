@@ -7,9 +7,7 @@ import '../../../../core/supabase/supabase_provider.dart';
 import '../../../../core/data/opportunity_providers.dart';
 import '../../../../core/models/opportunity_model.dart';
 import '../../../auth/data/models/user_model.dart';
-import '../../../home/presentation/providers/home_provider.dart';
 import '../../data/repositories/admin_user_repository.dart';
-import '../../data/services/admin_user_service.dart';
 import '../../../notifications/presentation/providers/notification_provider.dart';
 
 /// Every opportunity including drafts (RLS lets admins see them).
@@ -17,12 +15,8 @@ final adminOpportunitiesProvider = FutureProvider<List<OpportunityModel>>(
   (ref) => ref.watch(opportunityRepositoryProvider).getAllForAdmin(),
 );
 
-final adminUserServiceProvider = Provider(
-  (ref) => AdminUserService(ref.watch(supabaseClientProvider)),
-);
-
 final adminUserRepositoryProvider = Provider(
-  (ref) => AdminUserRepository(ref.watch(adminUserServiceProvider)),
+  (ref) => AdminUserRepository(ref.watch(supabaseClientProvider)),
 );
 
 final adminUsersProvider = FutureProvider<List<UserModel>>(
@@ -42,21 +36,13 @@ class AdminController extends Notifier<bool> {
     state = true;
     try {
       await action();
-      _refreshLists();
+      ref.invalidate(opportunityRepositoryProvider);
       return null;
     } catch (e) {
       return failureMessage(e);
     } finally {
       state = false;
     }
-  }
-
-  void _refreshLists() {
-    ref.invalidate(adminOpportunitiesProvider);
-    ref.invalidate(homeRecommendationsProvider);
-    ref.invalidate(homeRemindersProvider);
-    ref.invalidate(opportunityByIdProvider);
-    ref.invalidate(searchResultsProvider);
   }
 
   Future<String?> save(

@@ -7,13 +7,9 @@ import '../../../../core/errors/failures.dart';
 import '../../../../core/supabase/supabase_provider.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
-import '../../data/services/auth_service.dart';
 
-final authServiceProvider = Provider(
-  (ref) => AuthService(ref.watch(supabaseClientProvider)),
-);
 final authRepositoryProvider = Provider(
-  (ref) => AuthRepository(ref.watch(authServiceProvider)),
+  (ref) => AuthRepository(ref.watch(supabaseClientProvider)),
 );
 
 /// Holds the signed-in user's profile. `null` means signed out.

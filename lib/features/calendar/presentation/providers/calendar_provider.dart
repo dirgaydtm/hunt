@@ -9,14 +9,3 @@ final calendarMonthEventsProvider =
       (ref, month) =>
           ref.watch(opportunityRepositoryProvider).getByEventMonth(month),
     );
-
-class CalendarCategoryNotifier extends Notifier<String> {
-  @override
-  String build() => 'All';
-  void setCategory(String c) => state = c;
-}
-
-final calendarCategoryProvider =
-    NotifierProvider<CalendarCategoryNotifier, String>(
-      CalendarCategoryNotifier.new,
-    );

@@ -1,16 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/supabase/supabase_provider.dart';
+import '../supabase/supabase_provider.dart';
 import '../models/opportunity_model.dart';
 import 'opportunity_repository.dart';
-import 'opportunity_service.dart';
-
-final opportunityServiceProvider = Provider(
-  (ref) => OpportunityService(ref.watch(supabaseClientProvider)),
-);
 
 final opportunityRepositoryProvider = Provider(
-  (ref) => OpportunityRepository(ref.watch(opportunityServiceProvider)),
+  (ref) => OpportunityRepository(ref.watch(supabaseClientProvider)),
 );
 
 final opportunityByIdProvider =

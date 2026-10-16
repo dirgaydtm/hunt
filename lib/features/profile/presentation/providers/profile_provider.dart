@@ -5,14 +5,9 @@ import '../../../../core/errors/failures.dart';
 import '../../../../core/supabase/supabase_provider.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/repositories/profile_repository.dart';
-import '../../data/services/profile_service.dart';
-
-final profileServiceProvider = Provider(
-  (ref) => ProfileService(ref.watch(supabaseClientProvider)),
-);
 
 final profileRepositoryProvider = Provider(
-  (ref) => ProfileRepository(ref.watch(profileServiceProvider)),
+  (ref) => ProfileRepository(ref.watch(supabaseClientProvider)),
 );
 
 /// `true` while a profile save or avatar upload is in flight.

@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/hunt_text_field.dart';
 import '../../../../core/data/opportunity_repository.dart';
+import '../../../../core/models/opportunity_model.dart';
 import '../../../../core/widgets/filter_sheet.dart';
 import '../../../notifications/presentation/widgets/notification_bell.dart';
 import '../providers/bookmark_provider.dart';
@@ -23,7 +24,7 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
   void initState() {
     super.initState();
     _searchController = TextEditingController(
-      text: ref.read(bookmarkSearchQueryProvider),
+      text: ref.read(bookmarkFiltersProvider).query,
     );
   }
 
@@ -33,34 +34,31 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
     super.dispose();
   }
 
+  void _update(SearchFilters Function(SearchFilters) change) {
+    final notifier = ref.read(bookmarkFiltersProvider.notifier);
+    notifier.set(change(ref.read(bookmarkFiltersProvider)));
+  }
+
   void _showFilter(BuildContext context) async {
-    final current = ref
-        .read(bookmarkFiltersProvider)
-        .copyWith(category: ref.read(bookmarkCategoryProvider));
     final result = await showModalBottomSheet<SearchFilters>(
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => FilterSheet(initialFilters: current),
+      builder: (context) =>
+          FilterSheet(initialFilters: ref.read(bookmarkFiltersProvider)),
     );
-    if (result == null) return;
-    // Category lives in the header chips; the rest in bookmarkFilters.
-    ref.read(bookmarkCategoryProvider.notifier).setCategory(result.category);
-    ref
-        .read(bookmarkFiltersProvider.notifier)
-        .set(result.copyWith(category: 'Semua'));
+    if (result != null) _update((_) => result);
   }
 
   @override
   Widget build(BuildContext context) {
-    final selectedCategory = ref.watch(bookmarkCategoryProvider);
-    final categories = ['Semua', 'Beasiswa', 'Lomba', 'Magang'];
+    final selectedCategory = ref.watch(bookmarkFiltersProvider).category;
 
     return Container(
       decoration: BoxDecoration(
         color: AppColors.blueNormal,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
+        borderRadius: .vertical(bottom: .circular(30)),
         boxShadow: [
           BoxShadow(
             color: AppColors.blueNormal.withValues(alpha: 0.25),
@@ -73,12 +71,7 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.only(
-            top: 24,
-            left: 32,
-            right: 32,
-            bottom: 24,
-          ),
+          padding: .only(top: 24, left: 32, right: 32, bottom: 24),
           child: Column(
             children: [
               Row(
@@ -96,11 +89,8 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
                           size: 20,
                         ),
                       ),
-                      onChanged: (val) {
-                        ref
-                            .read(bookmarkSearchQueryProvider.notifier)
-                            .setQuery(val);
-                      },
+                      onChanged: (val) =>
+                          _update((f) => f.copyWith(query: val)),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -109,24 +99,19 @@ class _BookmarkHeaderState extends ConsumerState<BookmarkHeader> {
               ),
               const SizedBox(height: 24),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: categories.map((cat) {
+                mainAxisAlignment: .spaceBetween,
+                children: categoryFilters.map((cat) {
                   final isSelected = cat == selectedCategory;
                   return GestureDetector(
-                    onTap: () => ref
-                        .read(bookmarkCategoryProvider.notifier)
-                        .setCategory(cat),
+                    onTap: () => _update((f) => f.copyWith(category: cat)),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
+                      padding: .symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? AppColors.blueDark
                             : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: .circular(20),
                       ),
                       child: Text(
                         cat,
