@@ -20,9 +20,9 @@ import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/profile/presentation/pages/edit_profile_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
-import '../../shared/data/opportunity_repository.dart';
-import '../../shared/models/opportunity_model.dart';
-import '../../shared/widgets/main_layout.dart';
+import '../../core/data/opportunity_repository.dart';
+import '../../core/models/opportunity_model.dart';
+import '../../core/widgets/main_layout.dart';
 import 'auth_redirect.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {

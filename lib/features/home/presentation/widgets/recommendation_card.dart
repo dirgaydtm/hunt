@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared/widgets/opportunity_image.dart';
+import '../../../../core/widgets/opportunity_image.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../shared/widgets/category_tag.dart';
+import '../../../../core/widgets/category_tag.dart';
 
 class RecommendationCard extends StatelessWidget {
   final String title;

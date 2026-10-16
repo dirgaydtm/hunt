@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../shared/models/opportunity_model.dart';
+import '../../../../core/models/opportunity_model.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/supabase/supabase_provider.dart';
-import '../../../../shared/data/opportunity_providers.dart';
-import '../../../../shared/data/opportunity_repository.dart';
+import '../../../../core/data/opportunity_providers.dart';
+import '../../../../core/data/opportunity_repository.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/repositories/bookmark_repository.dart';
 import '../../data/services/bookmark_service.dart';

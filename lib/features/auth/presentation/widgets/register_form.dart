@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/hunt_text_field.dart';
+import '../../../../core/widgets/hunt_text_field.dart';
 import '../providers/auth_provider.dart';
 import 'auth_fields.dart';
 

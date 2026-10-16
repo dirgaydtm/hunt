@@ -5,9 +5,9 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../shared/models/opportunity_model.dart';
-import '../../../../shared/widgets/hunt_calendar.dart';
-import '../../../../shared/widgets/opportunity_card.dart';
+import '../../../../core/models/opportunity_model.dart';
+import '../../../../core/widgets/hunt_calendar.dart';
+import '../../../../core/widgets/opportunity_card.dart';
 import '../providers/calendar_provider.dart';
 
 const _kMonths = [

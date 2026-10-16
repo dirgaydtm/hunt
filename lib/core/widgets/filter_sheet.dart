@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/date_time_extension.dart';
-import '../../../../shared/widgets/hunt_calendar.dart';
+import '../../../../core/widgets/hunt_calendar.dart';
 import '../constants/locations.dart';
 import '../data/opportunity_repository.dart';
 import 'location_sheet.dart';
-import '../../../../shared/widgets/hunt_button.dart';
+import '../../../../core/widgets/hunt_button.dart';
 
 /// Pops a [SearchFilters] (keeping the initial query) when applied.
 class FilterSheet extends StatefulWidget {

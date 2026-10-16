@@ -7,12 +7,12 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../shared/data/opportunity_providers.dart';
-import '../../../../shared/data/opportunity_repository.dart';
-import '../../../../shared/models/opportunity_model.dart';
-import '../../../../shared/widgets/filter_sheet.dart';
-import '../../../../shared/widgets/hunt_text_field.dart';
-import '../../../../shared/widgets/opportunity_card.dart';
+import '../../../../core/data/opportunity_providers.dart';
+import '../../../../core/data/opportunity_repository.dart';
+import '../../../../core/models/opportunity_model.dart';
+import '../../../../core/widgets/filter_sheet.dart';
+import '../../../../core/widgets/hunt_text_field.dart';
+import '../../../../core/widgets/opportunity_card.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   final SearchFilters initialFilters;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../shared/widgets/hunt_button.dart';
-import '../../../../shared/widgets/hunt_text_field.dart';
+import '../../../../core/widgets/hunt_button.dart';
+import '../../../../core/widgets/hunt_text_field.dart';
 
 /// White rounded card with a [Form], the [fields] and a submit button.
 class AuthCard extends StatelessWidget {

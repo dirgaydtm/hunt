@@ -1,5 +1,5 @@
-import '../../../../shared/data/opportunity_service.dart';
-import '../../../../shared/models/opportunity_model.dart';
+import '../../../../core/data/opportunity_service.dart';
+import '../../../../core/models/opportunity_model.dart';
 import '../services/bookmark_service.dart';
 
 class BookmarkRepository {

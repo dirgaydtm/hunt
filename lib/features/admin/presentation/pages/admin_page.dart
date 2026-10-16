@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../shared/models/opportunity_model.dart';
-import '../../../../shared/widgets/category_tag.dart';
+import '../../../../core/models/opportunity_model.dart';
+import '../../../../core/widgets/category_tag.dart';
 import '../providers/admin_provider.dart';
 
 class AdminPage extends ConsumerStatefulWidget {

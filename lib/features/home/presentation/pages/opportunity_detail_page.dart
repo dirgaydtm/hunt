@@ -5,14 +5,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../shared/widgets/category_tag.dart';
-import '../../../../shared/widgets/hunt_accordion.dart';
-import '../../../../shared/widgets/hunt_button.dart';
-import '../../../../shared/data/opportunity_providers.dart';
+import '../../../../core/widgets/category_tag.dart';
+import '../../../../core/widgets/hunt_accordion.dart';
+import '../../../../core/widgets/hunt_button.dart';
+import '../../../../core/data/opportunity_providers.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../bookmark/presentation/providers/bookmark_provider.dart';
-import '../../../../shared/models/opportunity_model.dart';
-import '../../../../shared/widgets/opportunity_image.dart';
+import '../../../../core/models/opportunity_model.dart';
+import '../../../../core/widgets/opportunity_image.dart';
 
 /// Loads the opportunity by id. [initial] (passed from a list) is shown
 /// immediately while the fresh copy loads.

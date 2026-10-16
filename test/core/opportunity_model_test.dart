@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hunt/shared/data/opportunity_repository.dart';
-import 'package:hunt/shared/models/opportunity_model.dart';
+import 'package:hunt/core/data/opportunity_repository.dart';
+import 'package:hunt/core/models/opportunity_model.dart';
 
 Map<String, dynamic> row({
   String? start = '2026-06-08',

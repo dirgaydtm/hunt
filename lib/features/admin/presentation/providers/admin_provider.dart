@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/errors/failures.dart';
 import '../../../../core/supabase/supabase_provider.dart';
-import '../../../../shared/data/opportunity_providers.dart';
-import '../../../../shared/models/opportunity_model.dart';
+import '../../../../core/data/opportunity_providers.dart';
+import '../../../../core/models/opportunity_model.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../../home/presentation/providers/home_provider.dart';
 import '../../data/repositories/admin_user_repository.dart';

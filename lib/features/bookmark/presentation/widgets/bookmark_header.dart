@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../shared/widgets/hunt_text_field.dart';
-import '../../../../shared/data/opportunity_repository.dart';
-import '../../../../shared/widgets/filter_sheet.dart';
+import '../../../../core/widgets/hunt_text_field.dart';
+import '../../../../core/data/opportunity_repository.dart';
+import '../../../../core/widgets/filter_sheet.dart';
 import '../../../notifications/presentation/widgets/notification_bell.dart';
 import '../providers/bookmark_provider.dart';
 
