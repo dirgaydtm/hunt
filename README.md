@@ -1,87 +1,85 @@
 # Hunt
 
-Aplikasi Flutter untuk mencari peluang mahasiswa: **Beasiswa**, **Lomba**, dan **Magang**. Backend memakai [Supabase](https://supabase.com) (Auth, Postgres + RLS, Storage, Realtime).
+A Flutter app for students hunting scholarships, competitions, and internships.
 
-## Fitur
+* **One feed.** Beasiswa, Lomba, and Magang in one place, with search and filters for category, location, and registration dates.
+* **No missed deadlines.** Bookmark an opportunity and get a reminder three days before it closes.
+* **Admin panel.** Post opportunities, broadcast announcements, and decide who else can manage them.
 
-**Pengguna**
-- Onboarding (sekali tampil), login/daftar email, Google OAuth, lupa & reset kata sandi
-- Home: rekomendasi, kategori, pengingat deadline terdekat
-- Pencarian + filter kategori, lokasi, dan rentang tanggal
-- Detail peluang: syarat/berkas/ketentuan, buka link pendaftaran, share
-- Kalender event per bulan, filter kategori dan tanggal
-- Bookmark (toggle dari kartu maupun detail)
-- Notifikasi in-app realtime: pengingat deadline bookmark (H-3) dan pengumuman admin
-- Profil: edit data diri dan foto
-
-**Admin** (role `admin`, menu di halaman profil)
-- CRUD peluang (termasuk draft), upload gambar, tandai rekomendasi
-- Broadcast notifikasi ke semua pengguna
-- Kelola pengguna: beri/cabut akses admin
+Runs on [Supabase](https://supabase.com) (Auth, Postgres with RLS, Storage, Realtime). The app itself is in Indonesian.
 
 ## Setup
 
-1. **Buat project** di [supabase.com](https://supabase.com). Catat *Project URL* dan *publishable key* (atau anon key lama).
-2. **Jalankan skema database**, pilih salah satu:
-   - Supabase CLI: `supabase link --project-ref <ref>` lalu `supabase db push --include-seed`
-   - Manual: buka SQL Editor, jalankan isi `supabase/migrations/*.sql` berurutan, lalu `supabase/seed.sql`
-3. **Auth → URL Configuration**: tambahkan redirect URL `io.supabase.hunt://login-callback` (dipakai Google OAuth, konfirmasi email, dan reset password).
-4. *(Opsional)* **Auth → Providers → Google**: isi Client ID/Secret dari Google Cloud Console.
-5. **Konfigurasi app**: salin `.env.example` menjadi `.env` lalu isi `SUPABASE_URL` dan `SUPABASE_ANON_KEY`. `.env` tidak di-commit.
-6. **Jalankan**:
+1. Create a project on [supabase.com](https://supabase.com) and grab the Project URL and publishable key.
+
+2. Push the schema and sample data:
+
+   ```bash
+   supabase link --project-ref <ref>
+   supabase db push --include-seed
+   ```
+
+   No CLI? Run `supabase/migrations/*.sql` in order, then `supabase/seed.sql`, in the SQL Editor.
+
+3. In Auth > URL Configuration, add `io.supabase.hunt://login-callback`. Google login and email confirmation need it. Google login also needs a Client ID and Secret in Auth > Providers > Google.
+
+4. Add your keys:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Fill in `SUPABASE_URL` and `SUPABASE_ANON_KEY`. Use the publishable or anon key, never `service_role`.
+
+5. Run it:
+
    ```bash
    flutter pub get
    flutter run
    ```
-7. **Admin pertama**: daftar akun lewat app, lalu jalankan di SQL Editor:
-   ```sql
-   update profiles set role = 'admin' where email = 'kamu@contoh.com';
-   ```
 
-Pengingat deadline dijadwalkan harian via `pg_cron` (00:00 UTC). Untuk mencoba manual: `select generate_deadline_reminders();`
+## Usage
+
+Sign up in the app, then make yourself an admin from the SQL Editor:
+
+```sql
+update profiles set role = 'admin' where email = 'you@example.com';
+```
+
+The admin panel shows up on your profile page.
+
+Deadline reminders go out every day at 00:00 UTC through `pg_cron`. To send them right away:
+
+```sql
+select generate_deadline_reminders();
+```
+
+## Structure
+
+```
+lib/
+├── main.dart          # starts Supabase and SharedPreferences
+├── app/               # MaterialApp, router, login and admin guards
+├── core/              # theme, shared widgets, opportunity data, utils
+└── features/
+    ├── splash/
+    ├── onboarding/
+    ├── auth/
+    ├── home/          # home, search, opportunity detail
+    ├── calendar/
+    ├── bookmark/
+    ├── notifications/
+    ├── profile/
+    └── admin/
+
+supabase/
+├── migrations/        # schema, RLS, storage, notifications
+└── seed.sql           # sample data
+```
 
 ## Testing
 
 ```bash
 flutter analyze
 flutter test
-```
-
-## Struktur
-
-```
-lib/
-├── main.dart                 # init Supabase + SharedPreferences
-├── app/
-│   ├── app.dart              # MaterialApp.router
-│   └── config/
-│       ├── app_router.dart   # go_router + guard login/admin
-│       └── auth_redirect.dart
-├── core/
-│   ├── config/env.dart       # baca .env (flutter_dotenv)
-│   ├── errors/failures.dart  # exception → pesan Indonesia
-│   ├── preferences/
-│   ├── supabase/
-│   ├── theme/
-│   └── utils/
-├── features/
-│   ├── onboarding/
-│   ├── auth/
-│   ├── home/                 # home, search, detail
-│   ├── calendar/
-│   ├── bookmark/
-│   ├── notifications/
-│   ├── profile/
-│   └── admin/
-│       ├── data/{services,repositories}
-│       └── presentation/{providers,pages,widgets}
-└── shared/
-    ├── constants/            # daftar lokasi
-    ├── data/                 # OpportunityService/Repository + providers
-    ├── models/               # OpportunityModel
-    └── widgets/
-
-supabase/
-├── migrations/               # skema, RLS, storage, notifikasi
-└── seed.sql                  # data contoh
 ```
