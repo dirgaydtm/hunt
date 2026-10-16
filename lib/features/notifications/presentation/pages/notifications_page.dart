@@ -12,7 +12,7 @@ class NotificationsPage extends ConsumerWidget {
   const NotificationsPage({super.key});
 
   void _open(BuildContext context, WidgetRef ref, NotificationModel n) {
-    ref.read(notificationActionsProvider).markRead(n);
+    if (!n.isRead) ref.read(notificationRepositoryProvider).markRead(n.id);
     if (n.opportunityId != null) {
       context.push('/opportunity/${n.opportunityId}');
     }
@@ -37,7 +37,7 @@ class NotificationsPage extends ConsumerWidget {
           if (unread > 0)
             TextButton(
               onPressed: () =>
-                  ref.read(notificationActionsProvider).markAllRead(),
+                  ref.read(notificationRepositoryProvider).markAllRead(),
               child: const Text('Tandai semua dibaca'),
             ),
         ],
